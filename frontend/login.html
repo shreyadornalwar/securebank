@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureBank - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="public/chatbot.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366F1; --primary-dark: #4F46E5; --primary-light: #818CF8;
+            --secondary: #10B981; --accent: #F59E0B; --danger: #EF4444; --success: #22C55E;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 40%, #312E81 70%, #4338CA 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1a202c;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .bg-grid {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+        }
+
+        .floating-shape {
+            position: fixed; border-radius: 50%; opacity: 0.08;
+            animation: floatShape 20s infinite ease-in-out;
+        }
+        .floating-shape:nth-child(1) { width: 300px; height: 300px; background: var(--primary); top: 10%; left: 5%; }
+        .floating-shape:nth-child(2) { width: 200px; height: 200px; background: var(--secondary); top: 60%; right: 10%; animation-delay: -5s; }
+        .floating-shape:nth-child(3) { width: 150px; height: 150px; background: var(--accent); bottom: 20%; left: 30%; animation-delay: -10s; }
+
+        @keyframes floatShape {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(30px, -30px) scale(1.05); }
+            50% { transform: translate(-20px, 20px) scale(0.95); }
+            75% { transform: translate(15px, 10px) scale(1.02); }
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            padding: 16px 0;
+        }
+        .navbar-container {
+            max-width: 1200px; margin: 0 auto; padding: 0 24px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .nav-brand {
+            display: flex; align-items: center; gap: 10px;
+            text-decoration: none; color: white;
+        }
+        .nav-brand i { font-size: 28px; color: var(--primary-light); }
+        .nav-brand span { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+        .nav-home-link {
+            color: rgba(255,255,255,0.7); text-decoration: none; font-size: 14px;
+            font-weight: 500; display: flex; align-items: center; gap: 6px;
+            transition: color 0.3s;
+        }
+        .nav-home-link:hover { color: white; }
+
+        /* ===== LOGIN WRAP ===== */
+        .dm-login-wrap {
+            width: 100%; max-width: 440px; padding: 20px;
+            position: relative; z-index: 1;
+            animation: fadeInUp 0.6s ease-out;
+            margin-top: 40px;
+        }
+
+        .dm-login-card {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 24px;
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dm-login-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+        }
+
+        .dm-title-section {
+            text-align: center; margin-bottom: 24px;
+        }
+
+        .dm-title-section .dm-icon {
+            font-size: 32px; width: 72px; height: 72px;
+            margin: 0 auto 12px; display: grid; place-items: center;
+            background: rgba(99, 102, 241, 0.15);
+            border-radius: 18px; border: 1px solid rgba(99, 102, 241, 0.25);
+        }
+
+        .dm-title-section h1 {
+            margin: 0; font-size: 28px; font-weight: 800; color: white;
+        }
+
+        .dm-title-section p {
+            margin: 6px 0 0; font-size: 14px; color: rgba(255,255,255,0.6);
+        }
+
+        .dm-tabs {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px;
+        }
+
+        .tab {
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.6);
+            border-radius: 12px; padding: 12px 0;
+            font-size: 14px; font-weight: 700;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .tab.active {
+            background: var(--primary); color: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .tab:hover:not(.active) {
+            border-color: var(--primary-light); color: var(--primary-light);
+        }
+
+        .panel { display: none; }
+        .panel.active { display: block; }
+
+        .dm-form { display: grid; gap: 12px; margin-bottom: 14px; }
+
+        .dm-input {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 12px; padding: 14px 14px;
+            color: white; font-size: 14px; outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            width: 100%; font-family: inherit;
+        }
+
+        .dm-input::placeholder { color: rgba(255,255,255,0.4); }
+
+        .dm-input:focus {
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .dm-input option { background: #1E293B; color: white; }
+
+        .dm-error {
+            color: #f87171; font-size: 12px;
+            min-height: 16px; line-height: 16px; padding: 0 4px;
+        }
+
+        .dm-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #6366F1, #4F46E5);
+            border: none; color: #fff; padding: 14px;
+            border-radius: 12px; font-weight: 700;
+            font-size: 15px; letter-spacing: 0.3px;
+            cursor: pointer; transition: all 0.3s ease;
+            font-family: inherit;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .dm-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+        }
+
+        .dm-btn:disabled {
+            opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none;
+        }
+
+        .dm-quick-title {
+            color: rgba(255,255,255,0.5); font-size: 13px;
+            text-align: center; margin: 16px 0 10px;
+        }
+
+        .dm-quick-actions {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+        }
+
+        .quick-btn {
+            border: none; border-radius: 10px; padding: 10px 0;
+            color: #fff; font-weight: 700; font-size: 13px;
+            cursor: pointer; transition: all 0.3s ease; font-family: inherit;
+        }
+
+        .quick-btn:nth-child(1) { background: linear-gradient(135deg, #3B82F6, #2563EB); }
+        .quick-btn:nth-child(2) { background: linear-gradient(135deg, #F97316, #EA580C); }
+        .quick-btn:nth-child(3) { background: linear-gradient(135deg, #8B5CF6, #7C3AED); }
+
+        .quick-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .quick-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        .register-notice {
+            text-align: center; font-size: 12px;
+            color: rgba(255,255,255,0.4); margin-top: 12px;
+        }
+
+        #dmRegisterForm .dm-input {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+        }
+
+        #dmRegisterForm .dm-input:focus {
+            border-color: var(--primary-light);
+            background: rgba(255,255,255,0.08);
+        }
+
+        select.dm-input { cursor: pointer; appearance: auto; }
+
+        .dm-creds-box {
+            margin-top: 16px; padding: 14px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+        }
+
+        .dm-creds-title {
+            font-size: 12px; font-weight: 700; text-transform: uppercase;
+            color: var(--primary-light); margin-bottom: 10px; letter-spacing: 0.5px;
+        }
+
+        .dm-cred-row {
+            font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 4px;
+        }
+
+        .dm-cred-label {
+            font-weight: 600; color: var(--primary-light); min-width: 70px; display: inline-block;
+        }
+
+        .dm-cred-val { color: rgba(255,255,255,0.5); font-size: 12px; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 480px) {
+            .dm-login-wrap { padding: 12px; }
+            .dm-login-card { padding: 24px; }
+            .dm-title-section h1 { font-size: 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="floating-shape"></div>
+    <div class="floating-shape"></div>
+    <div class="floating-shape"></div>
+
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="nav-brand">
+                <i class="fas fa-university"></i>
+                <span>SecureBank</span>
+            </a>
+            <a href="index.html" class="nav-home-link"><i class="fas fa-arrow-left"></i> Back to Home</a>
+        </div>
+    </nav>
+
+    <div class="dm-login-wrap">
+        <div class="dm-login-card">
+            <div class="dm-title-section">
+                <div class="dm-icon">&#127974;</div>
+                <h1>Welcome Back</h1>
+                <p>Sign in to your SecureBank account</p>
+            </div>
+
+            <div class="dm-tabs">
+                <button id="tabLogin" class="tab active" type="button">Login</button>
+                <button id="tabRegister" class="tab" type="button">Register</button>
+            </div>
+
+            <div id="panelLogin" class="panel active">
+                <form id="dmLoginForm" class="dm-form">
+                    <input id="dmEmail" class="dm-input" type="text" placeholder="Email or Username" required />
+                    <div id="dmEmailError" class="dm-error"></div>
+
+                    <input id="dmPassword" class="dm-input" type="password" placeholder="Password" required minlength="6" />
+                    <div id="dmPasswordError" class="dm-error"></div>
+
+                    <select id="dmRole" class="dm-input" style="margin-top: 4px;">
+                        <option value="customer">Customer</option>
+                        <option value="staff">Staff</option>
+                        <option value="admin">Admin</option>
+                    </select>
+
+                    <button class="dm-btn" type="submit" id="dmLoginBtn">Login &rarr;</button>
+                </form>
+
+                <div class="dm-quick-title">Quick Login (Demo)</div>
+                <div class="dm-quick-actions">
+                    <button class="quick-btn" type="button" data-email="customer@securebank.com" data-pass="customer123" data-role="customer">Customer</button>
+                    <button class="quick-btn" type="button" data-email="staff@securebank.com" data-pass="staff123" data-role="staff">Staff</button>
+                    <button class="quick-btn" type="button" data-email="admin@securebank.com" data-pass="admin123" data-role="admin">Admin</button>
+                </div>
+
+                <div class="dm-creds-box">
+                    <div class="dm-creds-title">Demo Credentials</div>
+                    <div class="dm-cred-row"><span class="dm-cred-label">Customer:</span> <span class="dm-cred-val">customer@securebank.com / customer123</span></div>
+                    <div class="dm-cred-row"><span class="dm-cred-label">Staff:</span> <span class="dm-cred-val">staff@securebank.com / staff123</span></div>
+                    <div class="dm-cred-row"><span class="dm-cred-label">Admin:</span> <span class="dm-cred-val">admin@securebank.com / admin123</span></div>
+                </div>
+            </div>
+
+            <div id="panelRegister" class="panel">
+                <form id="dmRegisterForm" class="dm-form">
+                    <input id="regName" class="dm-input" type="text" placeholder="Full Name" required />
+                    <div id="regNameError" class="dm-error"></div>
+
+                    <input id="regEmail" class="dm-input" type="email" placeholder="Email Address" required />
+                    <div id="regEmailError" class="dm-error"></div>
+
+                    <input id="regPhone" class="dm-input" type="tel" placeholder="Phone Number" required />
+                    <div id="regPhoneError" class="dm-error"></div>
+
+                    <select id="regType" class="dm-input" style="padding: 12px;">
+                        <option value="SAVINGS">Savings Account</option>
+                        <option value="CHECKING">Checking Account</option>
+                    </select>
+
+                    <input id="regDeposit" class="dm-input" type="number" placeholder="Initial Deposit (&#8377;)" min="0" value="0" />
+                    <div id="regDepositError" class="dm-error"></div>
+
+                    <input id="regPassword" class="dm-input" type="password" placeholder="Create Password" required minlength="6" />
+                    <div id="regPasswordError" class="dm-error"></div>
+
+                    <input id="regConfirmPassword" class="dm-input" type="password" placeholder="Confirm Password" required minlength="6" />
+                    <div id="regConfirmError" class="dm-error"></div>
+
+                    <button class="dm-btn" type="submit" id="dmRegisterBtn">Register &rarr;</button>
+                </form>
+                <div class="register-notice">Already have an account? Click "Login" tab above.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            try {
+                var existingUser = JSON.parse(localStorage.getItem('currentUser'));
+                if (existingUser && existingUser.role) {
+                    existingUser.role = existingUser.role.toLowerCase();
+                    localStorage.setItem('currentUser', JSON.stringify(existingUser));
+                }
+            } catch(e) {}
+
+            var urlParams = new URLSearchParams(window.location.search);
+            var forceLogin = urlParams.get('action') === 'login';
+            if (!forceLogin) {
+                var existingToken = localStorage.getItem('token');
+                var existingUser = null;
+                try { existingUser = JSON.parse(localStorage.getItem('currentUser')); } catch(e) {}
+                if (existingToken && existingUser && existingUser.role) {
+                    var r = existingUser.role.toLowerCase();
+                    var currentPath = window.location.pathname;
+                    if (r === 'admin' && !currentPath.includes('admin.html')) { window.location.replace('admin.html'); return; }
+                    if (r === 'staff' && !currentPath.includes('staff-dashboard.html')) { window.location.replace('staff-dashboard.html'); return; }
+                    if (r === 'customer' && !currentPath.includes('customer-dashboard.html')) { window.location.replace('customer-dashboard.html'); return; }
+                }
+            }
+
+            var API_BASE_URL = 'http://localhost:8080/api';
+            var DEMO_USERS = [
+                { email: 'admin@securebank.com', password: 'admin123', role: 'admin', name: 'Admin User', id: 1 },
+                { email: 'staff@securebank.com', password: 'staff123', role: 'staff', name: 'Staff User', id: 2 },
+                { email: 'customer@securebank.com', password: 'customer123', role: 'customer', name: 'Customer User', id: 3 }
+            ];
+
+            function apiLogin(credentials) {
+                var controller = new AbortController();
+                var timer = setTimeout(function() { controller.abort(); }, 5000);
+                return fetch(API_BASE_URL + '/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(credentials),
+                    signal: controller.signal
+                })
+                .then(function(res) {
+                    clearTimeout(timer);
+                    if (!res.ok) {
+                        return res.json().catch(function() { return {}; }).then(function(data) {
+                            throw new Error(data.message || 'Invalid email or password');
+                        });
+                    }
+                    return res.json();
+                })
+                .then(function(data) {
+                    if (data.user && data.user.role) data.user.role = data.user.role.toLowerCase();
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('currentUser', JSON.stringify(data.user));
+                    return { success: true, user: data.user };
+                })
+                .catch(function(err) {
+                    var email = (credentials.email || '').trim().toLowerCase();
+                    var password = (credentials.password || '').trim();
+                    var user = null;
+                    for (var i = 0; i < DEMO_USERS.length; i++) {
+                        if (DEMO_USERS[i].email.toLowerCase() === email && DEMO_USERS[i].password === password) {
+                            user = DEMO_USERS[i]; break;
+                        }
+                    }
+                    if (user) {
+                        var userData = { id: user.id, email: user.email, role: user.role.toLowerCase(), name: user.name };
+                        localStorage.setItem('token', 'demo-token-' + user.id);
+                        localStorage.setItem('currentUser', JSON.stringify(userData));
+                        return { success: true, user: userData };
+                    }
+                    throw new Error(err.message || 'Invalid email or password');
+                });
+            }
+
+            var tabLogin = document.getElementById('tabLogin');
+            var tabRegister = document.getElementById('tabRegister');
+            var panelLogin = document.getElementById('panelLogin');
+            var panelRegister = document.getElementById('panelRegister');
+
+            if (urlParams.get('action') === 'signup') {
+                tabRegister.classList.add('active');
+                tabLogin.classList.remove('active');
+                panelRegister.classList.add('active');
+                panelLogin.classList.remove('active');
+            }
+
+            tabLogin.addEventListener('click', function() {
+                tabLogin.classList.add('active'); tabRegister.classList.remove('active');
+                panelLogin.classList.add('active'); panelRegister.classList.remove('active');
+            });
+            tabRegister.addEventListener('click', function() {
+                tabRegister.classList.add('active'); tabLogin.classList.remove('active');
+                panelRegister.classList.add('active'); panelLogin.classList.remove('active');
+            });
+
+            var dmLoginForm = document.getElementById('dmLoginForm');
+            var dmEmail = document.getElementById('dmEmail');
+            var dmPassword = document.getElementById('dmPassword');
+            var dmRole = document.getElementById('dmRole');
+            var dmEmailError = document.getElementById('dmEmailError');
+            var dmPasswordError = document.getElementById('dmPasswordError');
+            var dmLoginBtn = document.getElementById('dmLoginBtn');
+
+            function redirectToDashboard(role) {
+                switch(role) {
+                    case 'admin': window.location.href = 'admin.html'; break;
+                    case 'staff': window.location.href = 'staff-dashboard.html'; break;
+                    default: window.location.href = 'customer-dashboard.html';
+                }
+            }
+
+            function setLoginLoading(loading) {
+                dmLoginBtn.disabled = loading;
+                dmLoginBtn.textContent = loading ? 'Signing in...' : 'Login \u2192';
+                var quickBtns = document.querySelectorAll('.quick-btn');
+                for (var i = 0; i < quickBtns.length; i++) quickBtns[i].disabled = loading;
+            }
+
+            dmLoginForm.addEventListener('submit', function(e) {
+                e.preventDefault(); e.stopPropagation();
+                dmEmailError.textContent = ''; dmPasswordError.textContent = '';
+                var email = dmEmail.value.trim(); var password = dmPassword.value; var valid = true;
+                if (!email) { dmEmailError.textContent = 'Email or username is required.'; valid = false; }
+                if (password.length < 6) { dmPasswordError.textContent = 'Password must be at least 6 characters.'; valid = false; }
+                if (!valid) return;
+                setLoginLoading(true);
+                apiLogin({ email: email, password: password, role: dmRole.value })
+                    .then(function(response) {
+                        if (response.success) { redirectToDashboard(response.user.role); }
+                        else { dmEmailError.textContent = response.message || 'Authentication failed'; setLoginLoading(false); }
+                    })
+                    .catch(function(err) { dmEmailError.textContent = (err && err.message) || 'Could not connect to server'; setLoginLoading(false); });
+            });
+
+            var quickBtns = document.querySelectorAll('.quick-btn');
+            for (var i = 0; i < quickBtns.length; i++) {
+                quickBtns[i].addEventListener('click', function(e) {
+                    e.preventDefault(); e.stopPropagation();
+                    var btn = this; var email = btn.getAttribute('data-email');
+                    var pass = btn.getAttribute('data-pass'); var role = btn.getAttribute('data-role');
+                    setLoginLoading(true);
+                    apiLogin({ email: email, password: pass, role: role })
+                        .then(function(response) {
+                            if (response.success) { redirectToDashboard(response.user.role); }
+                            else { dmEmailError.textContent = response.message || 'Login failed'; setLoginLoading(false); }
+                        })
+                        .catch(function(err) { dmEmailError.textContent = (err && err.message) || 'Connection error'; setLoginLoading(false); });
+                });
+            }
+
+            var dmRegisterForm = document.getElementById('dmRegisterForm');
+            dmRegisterForm.addEventListener('submit', function(e) {
+                e.preventDefault(); e.stopPropagation();
+                var errorEls = dmRegisterForm.querySelectorAll('.dm-error');
+                for (var i = 0; i < errorEls.length; i++) errorEls[i].textContent = '';
+                var name = document.getElementById('regName').value.trim();
+                var email = document.getElementById('regEmail').value.trim();
+                var phone = document.getElementById('regPhone').value.trim();
+                var type = document.getElementById('regType').value;
+                var deposit = Number(document.getElementById('regDeposit').value) || 0;
+                var password = document.getElementById('regPassword').value;
+                var confirmPassword = document.getElementById('regConfirmPassword').value;
+                var valid = true;
+                if (!name) { document.getElementById('regNameError').textContent = 'Name is required.'; valid = false; }
+                if (!email || email.indexOf('@') === -1) { document.getElementById('regEmailError').textContent = 'Valid email is required.'; valid = false; }
+                if (!phone) { document.getElementById('regPhoneError').textContent = 'Phone is required.'; valid = false; }
+                if (password.length < 6) { document.getElementById('regPasswordError').textContent = 'Password must be at least 6 characters.'; valid = false; }
+                if (password !== confirmPassword) { document.getElementById('regConfirmError').textContent = 'Passwords do not match.'; valid = false; }
+                if (!valid) return;
+                var btn = document.getElementById('dmRegisterBtn');
+                btn.textContent = 'Creating Account...'; btn.disabled = true;
+                var regController = new AbortController();
+                var regTimer = setTimeout(function() { regController.abort(); }, 5000);
+                fetch(API_BASE_URL + '/accounts', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ owner: name, type: type, balance: deposit, email: email, password: password }),
+                    signal: regController.signal
+                })
+                .then(function(res) { clearTimeout(regTimer); if (!res.ok) return res.json().catch(function() { return {}; }).then(function(data) { throw new Error(data.message || 'Failed to create account'); }); return res.json(); })
+                .then(function() { alert('Account created successfully!\nName: ' + name + '\nEmail: ' + email); return apiLogin({ email: email, password: password, role: 'customer' }); })
+                .then(function(response) { if (response.success) { redirectToDashboard('customer'); } else { throw new Error(response.message || 'Login after registration failed'); } })
+                .catch(function(err) {
+                    var registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+                    var accId = 'ACC' + String(100 + registeredUsers.length).padStart(3, '0');
+                    registeredUsers.push({ id: registeredUsers.length + 1, name: name, email: email, phone: phone, accountId: accId, accountType: type, balance: deposit, role: 'customer', password: password });
+                    localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+                    var bankAccounts = JSON.parse(localStorage.getItem('bankAccounts') || '[]');
+                    bankAccounts.push({ id: accId, owner: name, type: type, balance: deposit, status: 'ACTIVE' });
+                    localStorage.setItem('bankAccounts', JSON.stringify(bankAccounts));
+                    localStorage.setItem('token', 'demo-token-new');
+                    localStorage.setItem('currentUser', JSON.stringify({ id: registeredUsers.length, name: name, email: email, role: 'customer', accountId: accId }));
+                    alert('Account created (demo mode)!\nAccount ID: ' + accId + '\nName: ' + name);
+                    window.location.href = 'customer-dashboard.html';
+                });
+            });
+        })();
+    </script>
+    <script src="public/chatbot.js"></script>
+</body>
+</html>

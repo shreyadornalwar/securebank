@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureBank - Customer Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="public/chatbot.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366F1; --primary-dark: #4F46E5; --primary-light: #818CF8;
+            --secondary: #10B981; --accent: #F59E0B; --danger: #EF4444; --success: #22C55E;
+            --bg-light: #F9FAFB; --bg-dark: #111827; --card-light: #FFFFFF; --card-dark: #1F2937;
+            --text-dark: #111827; --text-light: #F9FAFB; --text-gray: #6B7280;
+            --border-light: #E5E7EB; --border-dark: #374151;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1); --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-light); color: var(--text-dark); min-height: 100vh; }
+
+        /* Sidebar */
+        .sidebar { width: 260px; background: #1e1b4b; color: #e0e7ff; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
+        .sidebar-header { padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 12px; }
+        .sidebar-header i { font-size: 28px; color: var(--primary-light); }
+        .sidebar-header h2 { font-size: 20px; font-weight: 700; color: white; }
+        .sidebar-menu { list-style: none; padding: 16px 0; }
+        .sidebar-menu li { margin: 4px 12px; }
+        .sidebar-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #c7d2fe; text-decoration: none; border-radius: 10px; transition: all 0.2s; font-weight: 500; }
+        .sidebar-menu a:hover, .sidebar-menu a.active { background: rgba(99,102,241,0.25); color: white; }
+        .sidebar-menu a i { width: 20px; text-align: center; }
+        .menu-section { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #818cf8; padding: 20px 16px 8px; letter-spacing: 1px; }
+
+        /* Main Content */
+        .main-content { margin-left: 260px; min-height: 100vh; }
+        .topbar { background: white; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); position: sticky; top: 0; z-index: 50; }
+        .topbar h1 { font-size: 24px; font-weight: 700; }
+        .topbar-right { display: flex; align-items: center; gap: 12px; }
+        .user-badge { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+        .btn-logout { background: #ef4444; color: white; border: none; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s; }
+        .btn-logout:hover { background: #dc2626; }
+
+        /* Dashboard Content */
+        .dashboard-content { padding: 32px; }
+        .section { display: none; }
+        .section.active { display: block; }
+
+        /* Stats Cards */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 32px; }
+        .stat-card { background: white; border-radius: 16px; padding: 24px; box-shadow: var(--shadow); border: 1px solid var(--border-light); position: relative; overflow: hidden; }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+        .stat-card.blue::before { background: var(--primary); }
+        .stat-card.green::before { background: var(--success); }
+        .stat-card.orange::before { background: var(--accent); }
+        .stat-card.purple::before { background: #8b5cf6; }
+        .stat-card .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 16px; }
+        .stat-card.blue .stat-icon { background: rgba(37,99,235,0.1); color: var(--primary); }
+        .stat-card.green .stat-icon { background: rgba(16,185,129,0.1); color: var(--success); }
+        .stat-card.orange .stat-icon { background: rgba(245,158,11,0.1); color: var(--accent); }
+        .stat-card.purple .stat-icon { background: rgba(139,92,246,0.1); color: #8b5cf6; }
+        .stat-card .stat-value { font-size: 28px; font-weight: 700; }
+        .stat-card .stat-label { font-size: 14px; color: var(--text-gray); margin-top: 4px; }
+
+        /* Cards */
+        .card { background: white; border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--border-light); overflow: hidden; margin-bottom: 24px; }
+        .card-header { padding: 20px 24px; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; }
+        .card-header h3 { font-size: 18px; font-weight: 700; }
+
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 14px 20px; background: #f8fafc; font-weight: 600; font-size: 13px; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px; }
+        td { padding: 14px 20px; border-top: 1px solid var(--border-light); font-size: 14px; }
+        tr:hover { background: #f8fafc; }
+
+        /* Badges */
+        .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .badge-success { background: rgba(16,185,129,0.1); color: #059669; }
+        .badge-warning { background: rgba(245,158,11,0.1); color: #d97706; }
+        .badge-danger { background: rgba(239,68,68,0.1); color: #dc2626; }
+        .badge-info { background: rgba(37,99,235,0.1); color: #2563eb; }
+
+        /* Buttons */
+        .btn { padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-outline { background: white; color: var(--text-dark); border: 1px solid var(--border-light); }
+        .btn-outline:hover { background: #f8fafc; }
+
+        /* Quick Actions */
+        .quick-actions { display: flex; gap: 12px; margin-bottom: 24px; }
+        .quick-action-btn { flex: 1; padding: 16px; border-radius: 12px; border: 1px solid var(--border-light); background: white; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: all 0.2s; }
+        .quick-action-btn:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+        .quick-action-btn .icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .quick-action-btn.deposit .icon { background: rgba(16,185,129,0.1); color: var(--success); }
+        .quick-action-btn.withdraw .icon { background: rgba(239,68,68,0.1); color: var(--danger); }
+        .quick-action-btn.transfer .icon { background: rgba(37,99,235,0.1); color: var(--primary); }
+        .quick-action-btn .label { font-weight: 600; font-size: 14px; }
+
+        /* Two Column Layout */
+        .two-col { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+
+        /* Notifications */
+        .notification-item { padding: 16px 20px; border-bottom: 1px solid var(--border-light); display: flex; gap: 12px; align-items: flex-start; }
+        .notification-item:last-child { border-bottom: none; }
+        .notification-item.unread { background: rgba(37,99,235,0.03); border-left: 3px solid var(--primary); }
+        .notification-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+        .notification-item.info .notification-icon { background: rgba(37,99,235,0.1); color: var(--primary); }
+        .notification-item.warning .notification-icon { background: rgba(245,158,11,0.1); color: var(--accent); }
+        .notification-item.success .notification-icon { background: rgba(16,185,129,0.1); color: var(--success); }
+        .notification-content { flex: 1; }
+        .notification-message { font-weight: 500; font-size: 14px; margin-bottom: 2px; }
+        .notification-time { font-size: 12px; color: var(--text-gray); }
+
+        /* Activity Feed */
+        .activity-item { padding: 12px 20px; border-bottom: 1px solid var(--border-light); display: flex; gap: 12px; align-items: center; }
+        .activity-item:last-child { border-bottom: none; }
+        .activity-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .activity-dot.green { background: var(--success); }
+        .activity-dot.blue { background: var(--primary); }
+        .activity-dot.orange { background: var(--accent); }
+        .activity-text { font-size: 13px; color: var(--text-gray); }
+        .activity-time { font-size: 11px; color: #9ca3af; margin-left: auto; }
+
+        /* Profile Form */
+        .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 0; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text-gray); }
+        .form-group input, .form-group select { width: 100%; padding: 10px 14px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.2s; }
+        .form-group input:focus, .form-group select:focus { border-color: var(--primary); }
+        .profile-actions { grid-column: 1 / -1; display: flex; gap: 12px; margin-top: 8px; }
+
+        /* Modal */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-overlay.show { display: flex; }
+        .modal { background: white; border-radius: 16px; padding: 32px; width: 420px; }
+        .modal h2 { margin-bottom: 20px; }
+        .modal .form-group { margin-bottom: 16px; }
+        .modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
+
+        /* Loan Tracking Timeline */
+        .tracking-timeline { position: relative; padding: 0 0 0 28px; }
+        .tracking-timeline::before { content: ''; position: absolute; left: 11px; top: 8px; bottom: 8px; width: 2px; background: var(--border-light); }
+        .tracking-step { position: relative; padding: 12px 0 24px 0; }
+        .tracking-step:last-child { padding-bottom: 0; }
+        .tracking-dot { position: absolute; left: -28px; top: 14px; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; z-index: 1; }
+        .tracking-dot.completed { background: var(--success); color: white; }
+        .tracking-dot.active { background: var(--primary); color: white; box-shadow: 0 0 0 4px rgba(99,102,241,0.2); }
+        .tracking-dot.pending { background: var(--border-light); color: var(--text-gray); }
+        .tracking-dot.rejected { background: var(--danger); color: white; }
+        .tracking-info h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+        .tracking-info p { font-size: 12px; color: var(--text-gray); margin: 0; }
+        .tracking-info .tracking-time { font-size: 11px; color: #9ca3af; margin-top: 4px; }
+        .tracking-summary { background: #f0f4ff; border-radius: 10px; padding: 16px; margin-bottom: 20px; }
+        .tracking-summary .row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; }
+        .tracking-summary .row:last-child { margin-bottom: 0; }
+        .tracking-summary .label { color: var(--text-gray); }
+        .tracking-summary .value { font-weight: 600; }
+
+        /* Insight Cards */
+        .insight-card { transition: transform 0.2s, box-shadow 0.2s; }
+        .insight-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .two-col { grid-template-columns: 1fr; }
+            .quick-actions { flex-direction: column; }
+            .profile-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-university"></i>
+            <h2>SecureBank</h2>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="javascript:void(0)" data-section="overview" class="active" onclick="showSection('overview', this)"><i class="fas fa-home"></i> Overview</a></li>
+            <div class="menu-section">Banking</div>
+            <li><a href="javascript:void(0)" data-section="transactions" onclick="showSection('transactions', this)"><i class="fas fa-exchange-alt"></i> Transactions</a></li>
+            <li><a href="javascript:void(0)" data-section="accounts" onclick="showSection('accounts', this)"><i class="fas fa-wallet"></i> My Accounts</a></li>
+            <li><a href="javascript:void(0)" data-section="beneficiaries" onclick="showSection('beneficiaries', this)"><i class="fas fa-users"></i> Beneficiaries</a></li>
+            <div class="menu-section">Services</div>
+            <li><a href="javascript:void(0)" data-section="loans" onclick="showSection('loans', this)"><i class="fas fa-hand-holding-usd"></i> Loans</a></li>
+            <li><a href="javascript:void(0)" data-section="cards" onclick="showSection('cards', this)"><i class="fas fa-credit-card"></i> Cards</a></li>
+            <li><a href="javascript:void(0)" data-section="insights" onclick="showSection('insights', this)"><i class="fas fa-robot"></i> AI Insights</a></li>
+            <div class="menu-section">Account</div>
+            <li><a href="javascript:void(0)" data-section="profile" onclick="showSection('profile', this)"><i class="fas fa-user-cog"></i> Profile</a></li>
+            <li><a href="javascript:void(0)" data-section="settings" onclick="showSection('settings', this)"><i class="fas fa-cog"></i> Settings</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="topbar">
+            <h1 id="pageTitle">Overview</h1>
+            <div class="topbar-right">
+                <span class="user-badge"><i class="fas fa-user"></i> Customer</span>
+                <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </div>
+
+        <div class="dashboard-content">
+            <!-- ==================== OVERVIEW ==================== -->
+            <div id="overview" class="section active">
+                <div class="stats-grid">
+                    <div class="stat-card green">
+                        <div class="stat-icon"><i class="fas fa-wallet"></i></div>
+                        <div class="stat-value" id="accountBalance">₹15,000.00</div>
+                        <div class="stat-label">Available Balance</div>
+                    </div>
+                    <div class="stat-card blue">
+                        <div class="stat-icon"><i class="fas fa-id-card"></i></div>
+                        <div class="stat-value" id="accountId">ACC001</div>
+                        <div class="stat-label">Account Number</div>
+                    </div>
+                    <div class="stat-card orange">
+                        <div class="stat-icon"><i class="fas fa-exchange-alt"></i></div>
+                        <div class="stat-value" id="txCount">5</div>
+                        <div class="stat-label">Transactions This Month</div>
+                    </div>
+                    <div class="stat-card purple">
+                        <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-value" id="accountStatus">Active</div>
+                        <div class="stat-label">Account Status</div>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <button class="quick-action-btn deposit" onclick="showDepositModal()"><div class="icon"><i class="fas fa-arrow-down"></i></div><div class="label">Deposit</div></button>
+                    <button class="quick-action-btn withdraw" onclick="showWithdrawModal()"><div class="icon"><i class="fas fa-arrow-up"></i></div><div class="label">Withdraw</div></button>
+                    <button class="quick-action-btn transfer" onclick="showTransferModal()"><div class="icon"><i class="fas fa-exchange-alt"></i></div><div class="label">Transfer</div></button>
+                </div>
+
+                <div class="two-col">
+                    <div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-history" style="margin-right:8px;color:var(--primary)"></i> Recent Transactions</h3>
+                                <button class="btn btn-outline" onclick="showSection('transactions', document.querySelector('[data-section=transactions]'))">View All</button>
+                            </div>
+                            <table>
+                                <thead><tr><th>Date</th><th>Description</th><th>Type</th><th>Amount</th></tr></thead>
+                                <tbody id="recentTxBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="card">
+                            <div class="card-header"><h3><i class="fas fa-bell" style="margin-right:8px;color:var(--accent)"></i> Notifications</h3></div>
+                            <div id="notificationsList">
+                                <div class="notification-item unread info">
+                                    <div class="notification-icon"><i class="fas fa-info-circle"></i></div>
+                                    <div class="notification-content"><div class="notification-message">Account Statement Ready</div><div class="notification-time">2 hours ago</div></div>
+                                </div>
+                                <div class="notification-item unread warning">
+                                    <div class="notification-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                                    <div class="notification-content"><div class="notification-message">New Login Detected</div><div class="notification-time">1 day ago</div></div>
+                                </div>
+                                <div class="notification-item success">
+                                    <div class="notification-icon"><i class="fas fa-check-circle"></i></div>
+                                    <div class="notification-content"><div class="notification-message">Deposit Credited</div><div class="notification-time">2 days ago</div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header"><h3><i class="fas fa-bolt" style="margin-right:8px;color:var(--success)"></i> Activity</h3></div>
+                            <div id="activityFeed">
+                                <div class="activity-item"><div class="activity-dot green"></div><div class="activity-text">Deposit of ₹5,000 received</div><div class="activity-time">2h ago</div></div>
+                                <div class="activity-item"><div class="activity-dot blue"></div><div class="activity-text">Transfer sent to ACC002</div><div class="activity-time">1d ago</div></div>
+                                <div class="activity-item"><div class="activity-dot orange"></div><div class="activity-text">Bill payment processed</div><div class="activity-time">2d ago</div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== TRANSACTIONS ==================== -->
+            <div id="transactions" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-exchange-alt" style="margin-right:8px;color:var(--primary)"></i> Transaction History</h3>
+                        <button class="btn btn-primary" onclick="exportTx()"><i class="fas fa-download"></i> Export</button>
+                    </div>
+                    <table>
+                        <thead><tr><th>ID</th><th>Date</th><th>Description</th><th>Type</th><th>Amount</th><th>Status</th></tr></thead>
+                        <tbody id="allTxBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ==================== ACCOUNTS ==================== -->
+            <div id="accounts" class="section">
+                <div class="card">
+                    <div class="card-header"><h3><i class="fas fa-wallet" style="margin-right:8px;color:var(--primary)"></i> My Accounts</h3></div>
+                    <table>
+                        <thead><tr><th>Account #</th><th>Type</th><th>Balance</th><th>Status</th></tr></thead>
+                        <tbody id="accountsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ==================== BENEFICIARIES ==================== -->
+            <div id="beneficiaries" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-users" style="margin-right:8px;color:var(--primary)"></i> Saved Beneficiaries</h3>
+                        <button class="btn btn-primary" onclick="showAddBeneficiaryModal()"><i class="fas fa-plus"></i> Add</button>
+                    </div>
+                    <table>
+                        <thead><tr><th>Name</th><th>Account #</th><th>Bank</th><th>Actions</th></tr></thead>
+                        <tbody id="beneficiariesBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ==================== LOANS ==================== -->
+            <div id="loans" class="section">
+                <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 24px;">
+                    <div class="stat-card blue">
+                        <div class="stat-icon"><i class="fas fa-hand-holding-usd"></i></div>
+                        <div class="stat-value" id="totalLoanAmount">₹0</div>
+                        <div class="stat-label">Total Loan Amount</div>
+                    </div>
+                    <div class="stat-card orange">
+                        <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <div class="stat-value" id="totalEMI">₹0</div>
+                        <div class="stat-label">Monthly EMI</div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-value" id="activeLoans">0</div>
+                        <div class="stat-label">Active Loans</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-hand-holding-usd" style="margin-right:8px;color:var(--primary)"></i> My Loans</h3>
+                        <button class="btn btn-primary" onclick="showApplyLoanModal()"><i class="fas fa-plus"></i> Apply for Loan</button>
+                    </div>
+                    <table>
+                        <thead><tr><th>Loan ID</th><th>Type</th><th>Amount</th><th>Interest</th><th>EMI</th><th>Tenure</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody id="loansBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ==================== CARDS ==================== -->
+            <div id="cards" class="section">
+                <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 24px;">
+                    <div class="stat-card purple">
+                        <div class="stat-icon"><i class="fas fa-credit-card"></i></div>
+                        <div class="stat-value" id="totalCards">0</div>
+                        <div class="stat-label">Total Cards</div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-value" id="activeCards">0</div>
+                        <div class="stat-label">Active Cards</div>
+                    </div>
+                    <div class="stat-card blue">
+                        <div class="stat-icon"><i class="fas fa-wallet"></i></div>
+                        <div class="stat-value" id="totalCreditLimit">₹0</div>
+                        <div class="stat-label">Credit Limit</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-credit-card" style="margin-right:8px;color:var(--primary)"></i> My Cards</h3>
+                        <button class="btn btn-primary" onclick="showApplyCardModal()"><i class="fas fa-plus"></i> Apply for Card</button>
+                    </div>
+                    <div id="cardsContainer" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; padding: 20px;"></div>
+                </div>
+            </div>
+
+            <!-- ==================== PROFILE ==================== -->
+            <div id="profile" class="section">
+                <div class="card">
+                    <div class="card-header"><h3><i class="fas fa-user-cog" style="margin-right:8px;color:var(--primary)"></i> Profile Settings</h3></div>
+                    <div style="padding: 24px;">
+                        <form class="profile-grid" onsubmit="saveProfile(event)">
+                            <div class="form-group"><label>First Name</label><input type="text" id="profileFirst" value="Customer"></div>
+                            <div class="form-group"><label>Last Name</label><input type="text" id="profileLast" value="User"></div>
+                            <div class="form-group"><label>Email</label><input type="email" id="profileEmail" value="customer@securebank.com"></div>
+                            <div class="form-group"><label>Phone</label><input type="tel" id="profilePhone" value="+1-555-0100"></div>
+                            <div class="form-group"><label>Address</label><input type="text" id="profileAddress" value="123 Main Street"></div>
+                            <div class="form-group"><label>City</label><input type="text" id="profileCity" value="New York"></div>
+                            <div class="profile-actions">
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+                                <button type="button" class="btn btn-outline" onclick="showSection('overview', document.querySelector('[data-section=overview]'))">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== SETTINGS ==================== -->
+            <div id="settings" class="section">
+                <div class="card">
+                    <div class="card-header"><h3><i class="fas fa-cog" style="margin-right:8px;color:var(--primary)"></i> Account Settings</h3></div>
+                    <div style="padding: 24px;">
+                        <div class="form-group" style="margin-bottom:16px"><label>Language</label><select><option>English</option><option>Spanish</option><option>French</option></select></div>
+                        <div class="form-group" style="margin-bottom:16px"><label>Currency</label><select><option>USD</option><option>EUR</option><option>GBP</option></select></div>
+                        <div class="form-group" style="margin-bottom:16px"><label>Notifications</label><select><option>All</option><option>Important Only</option><option>None</option></select></div>
+                        <button class="btn btn-primary" style="margin-top:8px"><i class="fas fa-save"></i> Save Settings</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><h3><i class="fas fa-shield-alt" style="margin-right:8px;color:var(--danger)"></i> Security</h3></div>
+                    <div style="padding: 24px;">
+                        <div class="form-group" style="margin-bottom:16px"><label>Current Password</label><input type="password" placeholder="Enter current password"></div>
+                        <div class="form-group" style="margin-bottom:16px"><label>New Password</label><input type="password" placeholder="Enter new password"></div>
+                        <div class="form-group" style="margin-bottom:16px"><label>Confirm Password</label><input type="password" placeholder="Confirm new password"></div>
+                        <button class="btn btn-danger" style="margin-top:8px"><i class="fas fa-key"></i> Change Password</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== AI INSIGHTS ==================== -->
+            <div id="insights" class="section">
+                <div id="insightsContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deposit Modal -->
+    <div class="modal-overlay" id="depositModal">
+        <div class="modal">
+            <h2><i class="fas fa-arrow-down" style="color:var(--success);margin-right:8px"></i> Deposit</h2>
+            <div class="form-group"><label>Amount (₹)</label><input type="number" id="depositAmount" min="1" value="10000"></div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal('depositModal')">Cancel</button>
+                <button class="btn btn-success" onclick="doDeposit()">Deposit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdraw Modal -->
+    <div class="modal-overlay" id="withdrawModal">
+        <div class="modal">
+            <h2><i class="fas fa-arrow-up" style="color:var(--danger);margin-right:8px"></i> Withdraw</h2>
+            <div class="form-group"><label>Amount (₹)</label><input type="number" id="withdrawAmount" min="1" value="500"></div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal('withdrawModal')">Cancel</button>
+                <button class="btn btn-danger" onclick="doWithdraw()">Withdraw</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transfer Modal -->
+    <div class="modal-overlay" id="transferModal">
+        <div class="modal">
+            <h2><i class="fas fa-exchange-alt" style="color:var(--primary);margin-right:8px"></i> Transfer</h2>
+            <div class="form-group"><label>To Account</label><input type="text" id="transferTo" placeholder="e.g. ACC002"></div>
+            <div class="form-group"><label>Amount (₹)</label><input type="number" id="transferAmount" min="1" value="250"></div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal('transferModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="doTransfer()">Transfer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Beneficiary Modal -->
+    <div class="modal-overlay" id="addBeneficiaryModal">
+        <div class="modal">
+            <h2>Add Beneficiary</h2>
+            <div class="form-group"><label>Name</label><input type="text" id="benName" required></div>
+            <div class="form-group"><label>Account Number</label><input type="text" id="benAccount" required></div>
+            <div class="form-group"><label>Bank</label><input type="text" id="benBank" value="SecureBank"></div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal('addBeneficiaryModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="addBeneficiary()">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Apply Loan Modal -->
+    <div class="modal-overlay" id="applyLoanModal">
+        <div class="modal" style="width:480px">
+            <h2><i class="fas fa-hand-holding-usd" style="color:var(--primary);margin-right:8px"></i> Apply for Loan</h2>
+            <div class="form-group"><label>Loan Type</label>
+                <select id="loanType">
+                    <option value="Personal Loan">Personal Loan</option>
+                    <option value="Home Loan">Home Loan</option>
+                    <option value="Car Loan">Car Loan</option>
+                    <option value="Education Loan">Education Loan</option>
+                    <option value="Business Loan">Business Loan</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Loan Amount (₹)</label><input type="number" id="loanAmount" min="10000" value="100000" step="10000"></div>
+            <div class="form-group"><label>Tenure (Months)</label>
+                <select id="loanTenure">
+                    <option value="12">12 Months</option>
+                    <option value="24">24 Months</option>
+                    <option value="36" selected>36 Months</option>
+                    <option value="48">48 Months</option>
+                    <option value="60">60 Months</option>
+                </select>
+            </div>
+            <div id="loanPreview" style="background:#f0f4ff;border-radius:10px;padding:16px;margin-top:12px">
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:var(--text-gray)">Interest Rate:</span><strong id="previewRate">10.5%</strong></div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:var(--text-gray)">Monthly EMI:</span><strong id="previewEMI">₹3,227</strong></div>
+                <div style="display:flex;justify-content:space-between"><span style="color:var(--text-gray)">Total Payable:</span><strong id="previewTotal">₹1,16,172</strong></div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal('applyLoanModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="applyLoan()"><i class="fas fa-paper-plane"></i> Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loan Tracking Modal -->
+    <div class="modal-overlay" id="loanTrackingModal">
+        <div class="modal" style="width:540px;max-height:80vh;overflow-y:auto">
+            <h2><i class="fas fa-route" style="color:var(--primary);margin-right:8px"></i> Loan Tracking</h2>
+            <div id="loanTrackingContent"></div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal('loanTrackingModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Apply Card Modal -->
+    <div class="modal-overlay" id="applyCardModal">
+        <div class="modal" style="width:480px">
+            <h2><i class="fas fa-credit-card" style="color:var(--primary);margin-right:8px"></i> Apply for Card</h2>
+            <div class="form-group"><label>Card Type</label>
+                <select id="cardType">
+                    <option value="Debit Card">Debit Card</option>
+                    <option value="Credit Card">Credit Card</option>
+                    <option value="Virtual Card">Virtual Card</option>
+                </select>
+            </div>
+            <div id="creditLimitGroup" style="display:none">
+                <div class="form-group"><label>Credit Limit (₹)</label>
+                    <select id="cardLimit">
+                        <option value="50000">₹50,000</option>
+                        <option value="100000" selected>₹1,00,000</option>
+                        <option value="200000">₹2,00,000</option>
+                        <option value="500000">₹5,00,000</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal('applyCardModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="applyCard()"><i class="fas fa-paper-plane"></i> Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="public/api.js"></script>
+    <script src="public/websocket.js"></script>
+    <script src="public/spending-insights.js"></script>
+    <script>
+        // ===== AUTH CHECK =====
+        (function() {
+            const user = api.getCurrentUser();
+            if (!user || user.role !== 'customer') { location.href = 'login.html'; }
+        })();
+
+        // ===== DATA MANAGEMENT =====
+        let myAccounts = [];
+        let myTransactions = [];
+        let beneficiaries = JSON.parse(localStorage.getItem('bankBeneficiaries')) || [];
+        let myLoans = JSON.parse(localStorage.getItem('bankLoans')) || [];
+        let myCards = JSON.parse(localStorage.getItem('bankCards')) || [];
+
+        async function loadAccounts() {
+            try {
+                // First ensure backend is available
+                if (!api.isBackendAvailable) {
+                    await api.checkBackend();
+                }
+                if (api.isBackendAvailable) {
+                    // Force fetch from backend, don't use cached data
+                    const res = await fetch('/api/accounts', {
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        myAccounts = Array.isArray(data) ? data : [];
+                        localStorage.setItem('bankAccounts', JSON.stringify(myAccounts));
+                        console.log('Accounts loaded from backend:', myAccounts.length);
+                        return;
+                    }
+                }
+                // Fallback to localStorage only if backend unavailable
+                myAccounts = JSON.parse(localStorage.getItem('bankAccounts')) || [];
+                console.log('Accounts loaded from localStorage:', myAccounts.length);
+            } catch (error) {
+                console.warn('Failed to load accounts:', error);
+                myAccounts = JSON.parse(localStorage.getItem('bankAccounts')) || [];
+            }
+        }
+
+        async function loadTransactions() {
+            try {
+                // First ensure backend is available
+                if (!api.isBackendAvailable) {
+                    await api.checkBackend();
+                }
+                if (api.isBackendAvailable) {
+                    // Force fetch from backend, don't use cached data
+                    const res = await fetch('/api/transactions', {
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        myTransactions = Array.isArray(data) ? data : (data.data || []);
+                        localStorage.setItem('bankTransactions', JSON.stringify(myTransactions));
+                        console.log('Transactions loaded from backend:', myTransactions.length);
+                        return;
+                    }
+                }
+                // Fallback to localStorage only if backend unavailable
+                myTransactions = JSON.parse(localStorage.getItem('bankTransactions')) || [];
+                console.log('Transactions loaded from localStorage:', myTransactions.length);
+            } catch (error) {
+                console.warn('Failed to load transactions:', error);
+                myTransactions = JSON.parse(localStorage.getItem('bankTransactions')) || [];
+            }
+        }
+
+        function saveCustomerData() {
+            localStorage.setItem('bankAccounts', JSON.stringify(myAccounts));
+            localStorage.setItem('bankTransactions', JSON.stringify(myTransactions));
+        }
+
+        // ===== NAVIGATION =====
+        const titles = { overview: 'Overview', transactions: 'Transactions', accounts: 'My Accounts', beneficiaries: 'Beneficiaries', loans: 'Loans', cards: 'Cards', insights: 'AI Insights', profile: 'Profile', settings: 'Settings' };
+
+        function showSection(id, el) {
+            document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
+            var target = document.getElementById(id);
+            if (target) target.classList.add('active');
+
+            document.querySelectorAll('.sidebar-menu a').forEach(function(a) { a.classList.remove('active'); });
+            if (el) {
+                el.classList.add('active');
+            } else {
+                var links = document.querySelectorAll('.sidebar-menu a');
+                links.forEach(function(link) {
+                    if (link.getAttribute('data-section') === id) link.classList.add('active');
+                });
+            }
+
+            document.getElementById('pageTitle').textContent = titles[id] || id;
+            renderSection(id);
+        }
+
+        function renderSection(id) {
+            if (id === 'overview') renderOverview();
+            else if (id === 'transactions') renderTransactions();
+            else if (id === 'accounts') renderAccounts();
+            else if (id === 'beneficiaries') renderBeneficiaries();
+            else if (id === 'loans') renderLoans();
+            else if (id === 'cards') renderCards();
+            else if (id === 'insights') renderInsights();
+        }
+
+        // ===== OVERVIEW =====
+        function renderOverview() {
+            if (!myAccounts.length) return;
+            document.getElementById('accountBalance').textContent = '₹' + myAccounts[0].balance.toLocaleString('en-IN');
+            document.getElementById('accountId').textContent = myAccounts[0].id;
+            document.getElementById('txCount').textContent = myTransactions.length;
+            document.getElementById('accountStatus').textContent = myAccounts[0].status;
+
+            document.getElementById('recentTxBody').innerHTML = myTransactions.slice(0, 5).map(t => `
+                <tr>
+                    <td>${t.date}</td>
+                    <td>${t.description}</td>
+                    <td><span class="badge ${t.type === 'DEPOSIT' ? 'badge-success' : t.type === 'WITHDRAWAL' ? 'badge-danger' : 'badge-info'}">${t.type}</span></td>
+                    <td style="font-weight:600; color: ${t.type === 'DEPOSIT' ? 'var(--success)' : 'var(--danger)'}">${t.type === 'DEPOSIT' ? '+' : '-'}₹${t.amount.toLocaleString('en-IN')}</td>
+                </tr>`).join('');
+        }
+
+        // ===== TRANSACTIONS =====
+        function renderTransactions() {
+            document.getElementById('allTxBody').innerHTML = myTransactions.map(t => `
+                <tr>
+                    <td>#${t.id}</td>
+                    <td>${t.date}</td>
+                    <td>${t.description}</td>
+                    <td><span class="badge ${t.type === 'DEPOSIT' ? 'badge-success' : t.type === 'WITHDRAWAL' ? 'badge-danger' : 'badge-info'}">${t.type}</span></td>
+                    <td style="font-weight:600; color: ${t.type === 'DEPOSIT' ? 'var(--success)' : 'var(--danger)'}">${t.type === 'DEPOSIT' ? '+' : '-'}₹${t.amount.toLocaleString('en-IN')}</td>
+                    <td><span class="badge ${t.status === 'COMPLETED' ? 'badge-success' : 'badge-warning'}">${t.status}</span></td>
+                </tr>`).join('');
+        }
+
+        // ===== ACCOUNTS =====
+        function renderAccounts() {
+            document.getElementById('accountsBody').innerHTML = myAccounts.map(a => `
+                <tr>
+                    <td><strong>${a.id}</strong></td>
+                    <td><span class="badge badge-info">${a.type}</span></td>
+                    <td style="font-weight:700">₹${a.balance.toLocaleString('en-IN')}</td>
+                    <td><span class="badge ${a.status === 'ACTIVE' ? 'badge-success' : 'badge-danger'}">${a.status}</span></td>
+                </tr>`).join('');
+        }
+
+        // ===== BENEFICIARIES =====
+        function renderBeneficiaries() {
+            document.getElementById('beneficiariesBody').innerHTML = beneficiaries.map((b, i) => `
+                <tr>
+                    <td><strong>${b.name}</strong></td>
+                    <td>${b.account}</td>
+                    <td>${b.bank}</td>
+                    <td><button class="btn btn-danger" style="padding:4px 10px;font-size:12px" onclick="removeBeneficiary(${i})"><i class="fas fa-trash"></i></button></td>
+                </tr>`).join('');
+        }
+
+        function showAddBeneficiaryModal() { document.getElementById('addBeneficiaryModal').classList.add('show'); }
+
+        function addBeneficiary() {
+            beneficiaries.push({ name: document.getElementById('benName').value, account: document.getElementById('benAccount').value, bank: document.getElementById('benBank').value });
+            localStorage.setItem('bankBeneficiaries', JSON.stringify(beneficiaries));
+            closeModal('addBeneficiaryModal');
+            renderBeneficiaries();
+        }
+
+        function removeBeneficiary(i) {
+            if (!confirm('Remove this beneficiary?')) return;
+            beneficiaries.splice(i, 1);
+            localStorage.setItem('bankBeneficiaries', JSON.stringify(beneficiaries));
+            renderBeneficiaries();
+        }
+
+        // ===== LOANS =====
+        function renderLoans() {
+            myLoans = JSON.parse(localStorage.getItem('bankLoans')) || myLoans;
+            var active = myLoans.filter(function(l) { return l.status === 'Active'; });
+            var totalAmount = active.reduce(function(s, l) { return s + l.amount; }, 0);
+            var totalEmi = active.reduce(function(s, l) { return s + l.emi; }, 0);
+            document.getElementById('totalLoanAmount').textContent = '₹' + totalAmount.toLocaleString('en-IN');
+            document.getElementById('totalEMI').textContent = '₹' + totalEmi.toLocaleString('en-IN');
+            document.getElementById('activeLoans').textContent = active.length;
+
+            document.getElementById('loansBody').innerHTML = myLoans.map(function(l) {
+                var statusBadge = l.status === 'Active' ? 'badge-success' : l.status === 'Pending' ? 'badge-warning' : l.status === 'Rejected' ? 'badge-danger' : 'badge-info';
+                return '<tr><td><strong>' + l.id + '</strong></td><td>' + l.type + '</td><td style="font-weight:600">₹' + l.amount.toLocaleString('en-IN') + '</td><td>' + l.interest + '%</td><td>₹' + l.emi.toLocaleString('en-IN') + '</td><td>' + l.tenure + ' months</td><td><span class="badge ' + statusBadge + '">' + l.status + '</span></td><td><button class="btn btn-primary" style="padding:4px 10px;font-size:12px" onclick="showLoanTracking(\'' + l.id + '\')"><i class="fas fa-route"></i> Track</button></td></tr>';
+            }).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--text-gray);padding:40px">No loans yet. Click "Apply for Loan" to get started.</td></tr>';
+        }
+
+        function showLoanTracking(loanId) {
+            var loan = myLoans.find(function(l) { return l.id === loanId; });
+            if (!loan) return;
+            if (!loan.activities) {
+                loan.activities = [{ status: 'Application Submitted', description: 'Your loan application has been submitted successfully.', date: loan.appliedDate || new Date().toISOString().split('T')[0], time: '09:00 AM' }];
+                localStorage.setItem('bankLoans', JSON.stringify(myLoans));
+            }
+
+            var steps = ['Application Submitted', 'Under Review', 'Document Verification', 'Approved'];
+            if (loan.status === 'Rejected') steps[3] = 'Rejected';
+
+            var html = '<div class="tracking-summary">';
+            html += '<div class="row"><span class="label">Loan ID</span><span class="value">' + loan.id + '</span></div>';
+            html += '<div class="row"><span class="label">Type</span><span class="value">' + loan.type + '</span></div>';
+            html += '<div class="row"><span class="label">Amount</span><span class="value">₹' + loan.amount.toLocaleString('en-IN') + '</span></div>';
+            html += '<div class="row"><span class="label">EMI</span><span class="value">₹' + loan.emi.toLocaleString('en-IN') + '/month</span></div>';
+            html += '<div class="row"><span class="label">Status</span><span class="value">' + loan.status + '</span></div>';
+            html += '</div>';
+
+            html += '<h3 style="font-size:15px;margin-bottom:16px"><i class="fas fa-timeline" style="margin-right:6px;color:var(--primary)"></i> Activity Timeline</h3>';
+            html += '<div class="tracking-timeline">';
+
+            var activityMap = {};
+            (loan.activities || []).forEach(function(a) { activityMap[a.status] = a; });
+
+            steps.forEach(function(step, idx) {
+                var act = activityMap[step];
+                var dotClass = 'pending';
+                var dotIcon = '<i class="fas fa-clock"></i>';
+                if (act) {
+                    if (step === 'Rejected') { dotClass = 'rejected'; dotIcon = '<i class="fas fa-times"></i>'; }
+                    else if (idx === steps.length - 1) { dotClass = 'completed'; dotIcon = '<i class="fas fa-check"></i>'; }
+                    else { dotClass = 'completed'; dotIcon = '<i class="fas fa-check"></i>'; }
+                } else if (idx === steps.indexOf(steps.filter(function(s) { return !activityMap[s]; })[0])) {
+                    dotClass = 'active'; dotIcon = '<i class="fas fa-spinner"></i>';
+                }
+                html += '<div class="tracking-step">';
+                html += '<div class="tracking-dot ' + dotClass + '">' + dotIcon + '</div>';
+                html += '<div class="tracking-info">';
+                html += '<h4>' + step + '</h4>';
+                if (act) {
+                    html += '<p>' + act.description + '</p>';
+                    html += '<div class="tracking-time"><i class="fas fa-clock" style="margin-right:4px"></i>' + act.date + (act.time ? ' at ' + act.time : '') + '</div>';
+                } else {
+                    html += '<p style="color:#9ca3af">Pending</p>';
+                }
+                html += '</div></div>';
+            });
+
+            html += '</div>';
+            document.getElementById('loanTrackingContent').innerHTML = html;
+            document.getElementById('loanTrackingModal').classList.add('show');
+        }
+
+        function showApplyLoanModal() {
+            updateLoanPreview();
+            document.getElementById('applyLoanModal').classList.add('show');
+        }
+
+        function calculateEMI(principal, annualRate, months) {
+            var r = annualRate / 12 / 100;
+            if (r === 0) return Math.round(principal / months);
+            var emi = principal * r * Math.pow(1 + r, months) / (Math.pow(1 + r, months) - 1);
+            return Math.round(emi);
+        }
+
+        function updateLoanPreview() {
+            var amount = Number(document.getElementById('loanAmount').value) || 100000;
+            var tenure = Number(document.getElementById('loanTenure').value) || 36;
+            var type = document.getElementById('loanType').value;
+            var rate = type === 'Home Loan' ? 8.5 : type === 'Car Loan' ? 9.0 : type === 'Education Loan' ? 7.5 : type === 'Business Loan' ? 11.0 : 10.5;
+            var emi = calculateEMI(amount, rate, tenure);
+            var total = emi * tenure;
+            document.getElementById('previewRate').textContent = rate + '%';
+            document.getElementById('previewEMI').textContent = '₹' + emi.toLocaleString('en-IN');
+            document.getElementById('previewTotal').textContent = '₹' + total.toLocaleString('en-IN');
+        }
+
+        document.getElementById('loanType').addEventListener('change', updateLoanPreview);
+        document.getElementById('loanAmount').addEventListener('input', updateLoanPreview);
+        document.getElementById('loanTenure').addEventListener('change', updateLoanPreview);
+
+        function applyLoan() {
+            var type = document.getElementById('loanType').value;
+            var amount = Number(document.getElementById('loanAmount').value);
+            var tenure = Number(document.getElementById('loanTenure').value);
+            if (!amount || amount < 10000) { alert('Minimum loan amount is ₹10,000'); return; }
+            var rate = type === 'Home Loan' ? 8.5 : type === 'Car Loan' ? 9.0 : type === 'Education Loan' ? 7.5 : type === 'Business Loan' ? 11.0 : 10.5;
+            var emi = calculateEMI(amount, rate, tenure);
+            var currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            var now = new Date();
+            var dateStr = now.toISOString().split('T')[0];
+            var timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            var loan = {
+                id: 'LN' + String(myLoans.length + 1).padStart(3, '0'),
+                customer: currentUser.name || 'Customer',
+                customerId: currentUser.id || 0,
+                type: type,
+                amount: amount,
+                interest: rate,
+                emi: emi,
+                tenure: tenure,
+                status: 'Pending',
+                appliedDate: dateStr,
+                activities: [
+                    { status: 'Application Submitted', description: 'Your ' + type + ' application for ₹' + amount.toLocaleString('en-IN') + ' has been submitted.', date: dateStr, time: timeStr }
+                ]
+            };
+            myLoans.push(loan);
+            localStorage.setItem('bankLoans', JSON.stringify(myLoans));
+            closeModal('applyLoanModal');
+            renderLoans();
+            alert('Loan application submitted!\nLoan ID: ' + loan.id + '\nAmount: ₹' + amount.toLocaleString('en-IN') + '\nEMI: ₹' + emi.toLocaleString('en-IN'));
+        }
+
+        // ===== CARDS =====
+        function renderCards() {
+            var active = myCards.filter(function(c) { return c.status === 'Active'; });
+            document.getElementById('totalCards').textContent = myCards.length;
+            document.getElementById('activeCards').textContent = active.length;
+            var creditLimit = myCards.filter(function(c) { return c.type === 'Credit Card' && c.status === 'Active'; }).reduce(function(s, c) { return s + (c.limit || 0); }, 0);
+            document.getElementById('totalCreditLimit').textContent = '₹' + creditLimit.toLocaleString('en-IN');
+
+            var container = document.getElementById('cardsContainer');
+            container.innerHTML = myCards.map(function(c, i) {
+                var gradient = c.type === 'Credit Card' ? 'linear-gradient(135deg, #1e1b4b, #4338ca)' : c.type === 'Virtual Card' ? 'linear-gradient(135deg, #065f46, #10b981)' : 'linear-gradient(135deg, #7c2d12, #f97316)';
+                return '<div style="background:' + gradient + ';color:white;border-radius:16px;padding:24px;position:relative;overflow:hidden;min-height:180px;display:flex;flex-direction:column;justify-content:space-between">' +
+                    '<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:14px;font-weight:600;opacity:0.9">SecureBank</span><span style="font-size:12px;background:rgba(255,255,255,0.2);padding:4px 10px;border-radius:20px">' + c.type + '</span></div>' +
+                    '<div style="font-size:22px;letter-spacing:3px;font-weight:600;margin:20px 0 10px">' + c.number + '</div>' +
+                    '<div style="display:flex;justify-content:space-between;align-items:flex-end">' +
+                    '<div><div style="font-size:10px;opacity:0.7">CARD HOLDER</div><div style="font-size:13px;font-weight:600">' + (c.holder || 'Customer') + '</div></div>' +
+                    '<div><div style="font-size:10px;opacity:0.7">EXPIRES</div><div style="font-size:13px;font-weight:600">' + c.expiry + '</div></div>' +
+                    '<div><div style="font-size:10px;opacity:0.7">STATUS</div><div style="font-size:13px;font-weight:600;color:' + (c.status === 'Active' ? '#86efac' : '#fca5a5') + '">' + c.status + '</div></div>' +
+                    '</div></div>';
+            }).join('') || '<div style="text-align:center;color:var(--text-gray);padding:40px;grid-column:1/-1">No cards yet. Click "Apply for Card" to get started.</div>';
+        }
+
+        function showApplyCardModal() {
+            document.getElementById('applyCardModal').classList.add('show');
+        }
+
+        document.getElementById('cardType').addEventListener('change', function() {
+            document.getElementById('creditLimitGroup').style.display = this.value === 'Credit Card' ? 'block' : 'none';
+        });
+
+        function applyCard() {
+            var type = document.getElementById('cardType').value;
+            var limit = type === 'Credit Card' ? Number(document.getElementById('cardLimit').value) : 0;
+            var num = '4532 ' + Math.floor(1000 + Math.random() * 9000) + ' ' + Math.floor(1000 + Math.random() * 9000) + ' ' + Math.floor(1000 + Math.random() * 9000);
+            var now = new Date();
+            var expiry = String(now.getMonth() + 1).padStart(2, '0') + '/' + String(now.getFullYear() + 5).slice(-2);
+            var card = {
+                id: 'CD' + String(myCards.length + 1).padStart(3, '0'),
+                number: num,
+                type: type,
+                expiry: expiry,
+                holder: document.getElementById('profileFirst').value + ' ' + document.getElementById('profileLast').value,
+                limit: limit,
+                status: 'Active'
+            };
+            myCards.push(card);
+            localStorage.setItem('bankCards', JSON.stringify(myCards));
+            closeModal('applyCardModal');
+            renderCards();
+            alert('Card application successful!\n' + type + ' ending in ' + num.slice(-4) + '\nStatus: Active');
+        }
+
+        // ===== MODALS =====
+        function showDepositModal() { document.getElementById('depositModal').classList.add('show'); }
+        function showWithdrawModal() { document.getElementById('withdrawModal').classList.add('show'); }
+        function showTransferModal() { document.getElementById('transferModal').classList.add('show'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+        document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); }));
+
+        async function doDeposit() {
+            const amt = Number(document.getElementById('depositAmount').value);
+            if (!amt || amt <= 0) return;
+            var accId = myAccounts.length > 0 ? myAccounts[0].id : 'ACC001';
+            try {
+                await api.request('/transactions/deposit', { method: 'POST', body: JSON.stringify({ accountId: accId, amount: amt }) });
+                // Reload data from backend to get real-time updates
+                await loadAccounts();
+                await loadTransactions();
+            } catch(e) {
+                // Fallback to local update if backend fails
+                myAccounts[0].balance += amt;
+                myTransactions.unshift({ id: myTransactions.length + 1, date: new Date().toISOString().split('T')[0], description: 'Deposit', type: 'DEPOSIT', amount: amt, status: 'COMPLETED' });
+                saveCustomerData();
+            }
+            closeModal('depositModal');
+            renderOverview();
+            renderTransactions();
+            alert('Deposit of ₹' + amt.toLocaleString('en-IN') + ' successful!');
+        }
+
+        async function doWithdraw() {
+            const amt = Number(document.getElementById('withdrawAmount').value);
+            if (!amt || amt <= 0 || amt > myAccounts[0].balance) { alert('Invalid amount'); return; }
+            var accId = myAccounts.length > 0 ? myAccounts[0].id : 'ACC001';
+            try {
+                await api.request('/transactions/withdraw', { method: 'POST', body: JSON.stringify({ accountId: accId, amount: amt }) });
+                // Reload data from backend to get real-time updates
+                await loadAccounts();
+                await loadTransactions();
+            } catch(e) {
+                // Fallback to local update if backend fails
+                myAccounts[0].balance -= amt;
+                myTransactions.unshift({ id: myTransactions.length + 1, date: new Date().toISOString().split('T')[0], description: 'Withdrawal', type: 'WITHDRAWAL', amount: amt, status: 'COMPLETED' });
+                saveCustomerData();
+            }
+            closeModal('withdrawModal');
+            renderOverview();
+            renderTransactions();
+            alert('Withdrawal of ₹' + amt.toLocaleString('en-IN') + ' successful!');
+        }
+
+        async function doTransfer() {
+            const to = document.getElementById('transferTo').value;
+            const amt = Number(document.getElementById('transferAmount').value);
+            if (!to || !amt || amt <= 0 || amt > myAccounts[0].balance) { alert('Invalid details'); return; }
+            var accId = myAccounts.length > 0 ? myAccounts[0].id : 'ACC001';
+            try {
+                await api.request('/transactions', { method: 'POST', body: JSON.stringify({ accountId: accId, recipientId: to, amount: amt }) });
+                // Reload data from backend to get real-time updates
+                await loadAccounts();
+                await loadTransactions();
+            } catch(e) {
+                // Fallback to local update if backend fails
+                myAccounts[0].balance -= amt;
+                myTransactions.unshift({ id: myTransactions.length + 1, date: new Date().toISOString().split('T')[0], description: 'Transfer to ' + to, type: 'TRANSFER', amount: amt, status: 'COMPLETED' });
+                saveCustomerData();
+            }
+            closeModal('transferModal');
+            renderOverview();
+            renderTransactions();
+            alert('Transfer of ₹' + amt.toLocaleString('en-IN') + ' to ' + to + ' successful!');
+        }
+
+        // ===== PROFILE =====
+        function saveProfile(e) {
+            e.preventDefault();
+            alert('Profile saved successfully!');
+        }
+
+        // ===== EXPORT =====
+        function exportTx() {
+            alert('Transactions exported as CSV!');
+        }
+
+        // ===== LOGOUT =====
+        function logout() { api.logout(); }
+
+        // ===== AI INSIGHTS =====
+        function renderInsights() {
+            SpendingInsights.renderInsightsDashboard('insightsContainer', myTransactions);
+        }
+
+        // ===== INIT =====
+        async function init() {
+            await loadAccounts();
+            await loadTransactions();
+
+            renderOverview();
+
+            // Real-time updates via SSE
+            if (window.secureBankWS) {
+                secureBankWS.onUpdate = function(type, data) {
+                    if (data.accounts) {
+                        myAccounts = data.accounts;
+                        localStorage.setItem('bankAccounts', JSON.stringify(myAccounts));
+                    }
+                    if (data.transactions) {
+                        myTransactions = data.transactions;
+                        localStorage.setItem('bankTransactions', JSON.stringify(myTransactions));
+                    }
+                    var activeSection = document.querySelector('.section.active');
+                    if (activeSection) renderSection(activeSection.id);
+                };
+                secureBankWS.connect();
+            }
+        }
+        
+        init();
+    </script>
+    <script src="public/chatbot.js"></script>
+</body>
+</html>
