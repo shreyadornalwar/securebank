@@ -1,0 +1,26 @@
+services:
+  - name: securebank-backend
+    buildCommand: mvn clean package -DskipTests
+    startCommand: java -jar target/banking-system-1.0.0.jar
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          instance: securebank-db
+          property: connectionString
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          instance: securebank-db
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          instance: securebank-db
+          property: password
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: PORT
+        value: "8080"
+
+databases:
+  - name: securebank-db
+    databaseName: bankdb
+    plan: free
