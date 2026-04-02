@@ -1,5 +1,5 @@
 (function (window) {
-  const API_BASE_URL = 'http://localhost:8080/api';
+  const API_BASE_URL = 'https://securebank-ngv1.onrender.com/api';
 
   function timedFetch(url, options, timeout) {
     var controller = new AbortController();
