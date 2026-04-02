@@ -297,7 +297,7 @@
       }
 
       var self = this;
-      var url = 'https://securebank-ngv1.onrender.com/api/events';
+      var url = 'https://securebank-backend-rc4i.onrender.com/api/events';
 
       try {
         this.eventSource = new EventSource(url);

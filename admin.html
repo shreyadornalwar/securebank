@@ -655,7 +655,7 @@
 
         async function loadCustomers() {
             try {
-                const response = await fetchWithTimeout('https://securebank-ngv1.onrender.com/api/customers', {
+                const response = await fetchWithTimeout('https://securebank-backend-rc4i.onrender.com/api/customers', {
                     headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
                 });
                 if (response.ok) {
@@ -668,7 +668,7 @@
 
         async function loadStaff() {
             try {
-                const response = await fetchWithTimeout('https://securebank-ngv1.onrender.com/api/staff', {
+                const response = await fetchWithTimeout('https://securebank-backend-rc4i.onrender.com/api/staff', {
                     headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
                 });
                 if (response.ok) {
@@ -681,7 +681,7 @@
 
         async function loadAccounts() {
             try {
-                const response = await fetchWithTimeout('https://securebank-ngv1.onrender.com/api/accounts', {
+                const response = await fetchWithTimeout('https://securebank-backend-rc4i.onrender.com/api/accounts', {
                     headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
                 });
                 if (response.ok) {
@@ -695,7 +695,7 @@
 
         async function loadTransactions() {
             try {
-                const response = await fetchWithTimeout('https://securebank-ngv1.onrender.com/api/transactions', {
+                const response = await fetchWithTimeout('https://securebank-backend-rc4i.onrender.com/api/transactions', {
                     headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
                 });
                 if (response.ok) {
@@ -752,7 +752,7 @@
                 transactions.unshift({ id: transactions.length + 1, accountId: accId, type: 'DEPOSIT', amount: deposit, description: 'Initial Deposit', date: new Date().toISOString().split('T')[0], status: 'COMPLETED' });
             }
 
-            fetch('https://securebank-ngv1.onrender.com/api/accounts', {
+            fetch('https://securebank-backend-rc4i.onrender.com/api/accounts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ owner: name, type: type, balance: deposit, email: email, password: password })
