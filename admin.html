@@ -655,7 +655,7 @@
 
         async function loadCustomers() {
             try {
-                const response = await fetchWithTimeout('http://localhost:8080/api/customers', {
+                const response = await fetchWithTimeout('https://securebank-ngv1.onrender.com/api/customers', {
                     headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
                 });
                 if (response.ok) {
