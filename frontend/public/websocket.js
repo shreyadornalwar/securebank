@@ -24,7 +24,7 @@
       }
 
       var self = this;
-      var url = 'http://localhost:8080/api/events';
+      var url = 'https://securebank-ngv1.onrender.com/api/events';
 
       try {
         this.eventSource = new EventSource(url);
