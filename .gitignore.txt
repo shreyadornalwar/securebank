@@ -1,0 +1,8 @@
+node_modules/
+.vscode/
+target/
+build/
+.env
+*.log
+backend/node_modules/
+frontend/node_modules/
