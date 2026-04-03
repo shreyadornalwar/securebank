@@ -23,7 +23,7 @@ public class EmailService {
     private static final Logger log = LoggerFactory.getLogger(EmailService.class);
     private static final double DEFAULT_LOW_BALANCE_THRESHOLD = 500.0;
 
-    @Autowired
+    @Autowired(required = false)
     private JavaMailSender mailSender;
 
     @Autowired
@@ -33,6 +33,10 @@ public class EmailService {
 
     @Async
     public void sendTransactionEmail(int accountId, String transactionType, double amount, double newBalance) {
+        if (mailSender == null) {
+            log.debug("[EMAIL] Mail not configured, skipping transaction email for account {}", accountId);
+            return;
+        }
         try {
             String email = repository.findEmailByAccountId(accountId);
             if (email == null || email.isBlank()) {
@@ -64,6 +68,10 @@ public class EmailService {
 
     @Async
     public void sendAccountCreatedEmail(int accountId, String name, String email, double initialBalance) {
+        if (mailSender == null) {
+            log.debug("[EMAIL] Mail not configured, skipping account created email");
+            return;
+        }
         try {
             if (email == null || email.isBlank()) {
                 log.warn("[EMAIL] No email provided for new account ID: {}", accountId);
@@ -112,6 +120,10 @@ public class EmailService {
 
     @Async
     public void sendBalanceAlert(int accountId) {
+        if (mailSender == null) {
+            log.debug("[EMAIL] Mail not configured, skipping balance alert for account {}", accountId);
+            return;
+        }
         try {
             String email = repository.findEmailByAccountId(accountId);
             if (email == null || email.isBlank()) {
@@ -162,6 +174,10 @@ public class EmailService {
 
     @Async
     public void sendLowBalanceAlert(int accountId, double currentBalance, double threshold) {
+        if (mailSender == null) {
+            log.debug("[EMAIL] Mail not configured, skipping low balance alert for account {}", accountId);
+            return;
+        }
         try {
             String email = repository.findEmailByAccountId(accountId);
             if (email == null || email.isBlank()) {
@@ -205,6 +221,10 @@ public class EmailService {
 
     @Async
     public void sendTransactionSummary(int accountId) {
+        if (mailSender == null) {
+            log.debug("[EMAIL] Mail not configured, skipping transaction summary for account {}", accountId);
+            return;
+        }
         try {
             String email = repository.findEmailByAccountId(accountId);
             if (email == null || email.isBlank()) {
