@@ -1,4 +1,5 @@
 C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\config\CorsConfig.java
+C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\config\DatabaseConfigLogger.java
 C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\config\DatabaseInitializer.java
 C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\config\JwtAuthFilter.java
 C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\config\JwtUtil.java
@@ -9,12 +10,15 @@ C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\c
 C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\controller\BeneficiaryController.java
 C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\controller\CardController.java
 C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\controller\CustomerController.java
+C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\controller\DebugController.java
 C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\controller\EmailController.java
+C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\controller\HealthController.java
 C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\controller\LoanController.java
 C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\controller\NotificationController.java
 C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\controller\RootController.java
 C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\controller\SseController.java
 C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\controller\StaffController.java
+C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\controller\TestController.java
 C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\controller\TransactionController.java
 C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\controller\WebSocketController.java
 C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\exception\GlobalExceptionHandler.java

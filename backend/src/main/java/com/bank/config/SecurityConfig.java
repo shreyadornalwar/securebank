@@ -30,13 +30,11 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/login").permitAll()
                 .requestMatchers("/").permitAll()
                 .requestMatchers("/health").permitAll()
-                .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/ws/**").permitAll()
                 .requestMatchers("/api/events").permitAll()
                 .requestMatchers("/api/**").permitAll()  // Allow all API endpoints for development
                 .anyRequest().permitAll()
             )
-            .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
