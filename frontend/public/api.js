@@ -1,5 +1,5 @@
 (function (window) {
-  const API_BASE_URL = 'https://securebank-backend-rc4i.onrender.com/api';
+  const API_BASE_URL = 'https://securebank-ngv1.onrender.com/api';
 
   function timedFetch(url, options, timeout) {
     var controller = new AbortController();
@@ -297,7 +297,7 @@
       }
 
       var self = this;
-      var url = 'https://securebank-backend-rc4i.onrender.com/api/events';
+      var url = 'https://securebank-ngv1.onrender.com/api/events';
 
       try {
         this.eventSource = new EventSource(url);
