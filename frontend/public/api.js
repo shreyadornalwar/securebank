@@ -1,13 +1,24 @@
 (function (window) {
-  const API_BASE_URL = 'https://securebank-ngv1.onrender.com/api';
+  // ==================== CONFIGURATION ====================
+  const BASE_URL = "https://securebank-backend-rc4i.onrender.com";
+  const API_BASE_URL = BASE_URL + "/api";
+  // =====================================================
 
   function timedFetch(url, options, timeout) {
     var controller = new AbortController();
-    var timer = setTimeout(function() { controller.abort(); }, timeout || 5000);
+    var timer = setTimeout(function() { controller.abort(); }, timeout || 10000);
     options = options || {};
     options.signal = controller.signal;
     return fetch(url, options).then(function(r) { clearTimeout(timer); return r; })
       .catch(function(e) { clearTimeout(timer); throw e; });
+  }
+
+  function getAuthHeaders() {
+    var token = localStorage.getItem('token') || '';
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token
+    };
   }
 
   const api = {
@@ -15,10 +26,10 @@
 
     checkBackend: async function() {
       try {
-        const res = await timedFetch(`${API_BASE_URL}/accounts`, { method: 'GET' }, 5000);
+        const res = await timedFetch(`${API_BASE_URL}/health`, { method: 'GET' }, 5000);
         this.isBackendAvailable = res.ok || res.status === 401 || res.status === 403;
         if (this.isBackendAvailable) {
-          console.log('Backend connected successfully');
+          console.log('Backend connected successfully:', BASE_URL);
         }
         return this.isBackendAvailable;
       } catch (error) {
@@ -29,29 +40,34 @@
     },
 
     login: async function (credentials) {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-      const res = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(credentials),
-        signal: controller.signal
-      });
+        const res = await fetch(`${API_BASE_URL}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(credentials),
+          signal: controller.signal
+        });
 
-      clearTimeout(timeoutId);
+        clearTimeout(timeoutId);
 
-      if (!res.ok) {
-        const data = await res.json().catch(() => null);
-        return { success: false, message: data?.message || 'Login failed' };
+        if (!res.ok) {
+          const data = await res.json().catch(() => null);
+          return { success: false, message: data?.message || 'Login failed' };
+        }
+
+        const data = await res.json();
+        if (data.user && data.user.role) data.user.role = data.user.role.toLowerCase();
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('currentUser', JSON.stringify(data.user));
+        this.isBackendAvailable = true;
+        return { success: true, user: data.user };
+      } catch (error) {
+        console.error('Login error:', error.message);
+        return { success: false, message: 'Connection error: ' + error.message };
       }
-
-      const data = await res.json();
-      if (data.user && data.user.role) data.user.role = data.user.role.toLowerCase();
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('currentUser', JSON.stringify(data.user));
-      this.isBackendAvailable = true;
-      return { success: true, user: data.user };
     },
 
     logout: function () {
@@ -98,49 +114,57 @@
     getAccounts: async function () {
       try {
         var res = await timedFetch(`${API_BASE_URL}/accounts`, {
-          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (localStorage.getItem('token') || '') }
-        }, 5000);
+          headers: getAuthHeaders()
+        }, 10000);
         if (res.ok) {
           var data = await res.json();
           localStorage.setItem('bankAccounts', JSON.stringify(data));
           return data;
         }
-      } catch (e) {}
+      } catch (e) {
+        console.warn('Get accounts error:', e.message);
+      }
       return JSON.parse(localStorage.getItem('bankAccounts') || '[]');
     },
 
     getTransactions: async function () {
       try {
         var res = await timedFetch(`${API_BASE_URL}/transactions`, {
-          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (localStorage.getItem('token') || '') }
-        }, 5000);
+          headers: getAuthHeaders()
+        }, 10000);
         if (res.ok) {
           var data = await res.json();
           var txns = Array.isArray(data) ? data : (data.data || []);
           localStorage.setItem('bankTransactions', JSON.stringify(txns));
           return txns;
         }
-      } catch (e) {}
+      } catch (e) {
+        console.warn('Get transactions error:', e.message);
+      }
       return JSON.parse(localStorage.getItem('bankTransactions') || '[]');
     },
 
     getCustomers: async function () {
       try {
         var res = await timedFetch(`${API_BASE_URL}/customers`, {
-          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (localStorage.getItem('token') || '') }
-        }, 5000);
+          headers: getAuthHeaders()
+        }, 10000);
         if (res.ok) return await res.json();
-      } catch (e) {}
+      } catch (e) {
+        console.warn('Get customers error:', e.message);
+      }
       return [];
     },
 
     getStaff: async function () {
       try {
         var res = await timedFetch(`${API_BASE_URL}/staff`, {
-          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (localStorage.getItem('token') || '') }
-        }, 5000);
+          headers: getAuthHeaders()
+        }, 10000);
         if (res.ok) return await res.json();
-      } catch (e) {}
+      } catch (e) {
+        console.warn('Get staff error:', e.message);
+      }
       return [];
     },
 
@@ -149,9 +173,9 @@
       if (email) body.email = email;
       var res = await timedFetch(`${API_BASE_URL}/accounts`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (localStorage.getItem('token') || '') },
+        headers: getAuthHeaders(),
         body: JSON.stringify(body)
-      }, 5000);
+      }, 10000);
       if (res.ok) return { success: true };
       var data = await res.json().catch(() => ({}));
       return { success: false, message: data.message || 'Failed to create account' };
@@ -163,8 +187,8 @@
         : accountId;
       var res = await timedFetch(`${API_BASE_URL}/accounts/${intId}/balance?balance=${balance}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (localStorage.getItem('token') || '') }
-      }, 5000);
+        headers: getAuthHeaders()
+      }, 10000);
       if (res.ok) return { success: true };
       var data = await res.json().catch(() => ({}));
       return { success: false, message: data.message || 'Failed to update balance' };
@@ -176,8 +200,8 @@
         : accountId;
       var res = await timedFetch(`${API_BASE_URL}/accounts/${intId}`, {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (localStorage.getItem('token') || '') }
-      }, 5000);
+        headers: getAuthHeaders()
+      }, 10000);
       if (res.ok) return { success: true };
       var data = await res.json().catch(() => ({}));
       return { success: false, message: data.message || 'Failed to delete account' };
@@ -202,9 +226,9 @@
         var actualPath = path === '/transactions/deposit' ? '/deposit' : '/withdraw';
         var res = await timedFetch(`${API_BASE_URL}/transactions${actualPath}`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (localStorage.getItem('token') || '') },
+          headers: getAuthHeaders(),
           body: JSON.stringify({ accountId: accountId, amount: amount })
-        }, 10000);
+        }, 15000);
 
         if (!res.ok) {
           var json = await res.json().catch(function() { return {}; });
@@ -221,9 +245,9 @@
 
         var res = await timedFetch(`${API_BASE_URL}/transactions`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (localStorage.getItem('token') || '') },
+          headers: getAuthHeaders(),
           body: JSON.stringify({ accountId: accountId, recipientId: recipientId, amount: amount })
-        }, 10000);
+        }, 15000);
 
         if (!res.ok) {
           var json = await res.json().catch(function() { return {}; });
@@ -243,32 +267,41 @@
       try {
         var res = await timedFetch(`${API_BASE_URL}${endpoint}`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (localStorage.getItem('token') || '') },
+          headers: getAuthHeaders(),
           body: JSON.stringify(data)
-        }, 5000);
+        }, 10000);
         return res.ok;
-      } catch (e) { return false; }
+      } catch (e) { 
+        console.warn('Save error:', e.message);
+        return false; 
+      }
     },
 
     updateInBackend: async function (endpoint, data) {
       try {
         var res = await timedFetch(`${API_BASE_URL}${endpoint}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (localStorage.getItem('token') || '') },
+          headers: getAuthHeaders(),
           body: JSON.stringify(data)
-        }, 5000);
+        }, 10000);
         return res.ok;
-      } catch (e) { return false; }
+      } catch (e) { 
+        console.warn('Update error:', e.message);
+        return false; 
+      }
     },
 
     deleteFromBackend: async function (endpoint) {
       try {
         var res = await timedFetch(`${API_BASE_URL}${endpoint}`, {
           method: 'DELETE',
-          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (localStorage.getItem('token') || '') }
-        }, 5000);
+          headers: getAuthHeaders()
+        }, 10000);
         return res.ok;
-      } catch (e) { return false; }
+      } catch (e) { 
+        console.warn('Delete error:', e.message);
+        return false; 
+      }
     }
   };
 
@@ -276,7 +309,7 @@
     isConnected: false,
     eventSource: null,
     reconnectAttempts: 0,
-    maxReconnectAttempts: 3,
+    maxReconnectAttempts: 5,
     reconnectTimer: null,
     connectionFailed: false,
 
@@ -297,7 +330,7 @@
       }
 
       var self = this;
-      var url = 'https://securebank-ngv1.onrender.com/api/events';
+      var url = BASE_URL + '/api/events';
 
       try {
         this.eventSource = new EventSource(url);
@@ -306,7 +339,7 @@
           self.isConnected = true;
           self.reconnectAttempts = 0;
           self.connectionFailed = false;
-          console.log('[Realtime] Connected');
+          console.log('[Realtime] Connected to:', BASE_URL);
           if (typeof self.onConnect === 'function') self.onConnect();
         };
 

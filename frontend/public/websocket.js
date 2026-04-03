@@ -1,9 +1,13 @@
 (function(window) {
+  // ==================== CONFIGURATION ====================
+  const BASE_URL = "https://securebank-backend-rc4i.onrender.com";
+  // =====================================================
+
   var secureBankWS = {
     isConnected: false,
     eventSource: null,
     reconnectAttempts: 0,
-    maxReconnectAttempts: 3,
+    maxReconnectAttempts: 5,
     reconnectTimer: null,
     connectionFailed: false,
 
@@ -24,7 +28,7 @@
       }
 
       var self = this;
-      var url = 'https://securebank-ngv1.onrender.com/api/events';
+      var url = BASE_URL + '/api/events';
 
       try {
         this.eventSource = new EventSource(url);
@@ -33,7 +37,7 @@
           self.isConnected = true;
           self.reconnectAttempts = 0;
           self.connectionFailed = false;
-          console.log('[Realtime] Connected');
+          console.log('[Realtime] Connected to:', BASE_URL);
           if (typeof self.onConnect === 'function') self.onConnect();
         };
 
