@@ -29,8 +29,15 @@ public class DataSourceConfig {
         String url = jdbcUrl;
         
         // If URL doesn't start with jdbc:, add the prefix
+        // But also check for "postgresql://" and convert to full JDBC URL
         if (!url.startsWith("jdbc:")) {
-            url = "jdbc:" + url;
+            if (url.startsWith("postgresql://")) {
+                // Convert postgresql://host:port/db to jdbc:postgresql://host:port/db
+                url = "jdbc:" + url;
+            } else {
+                // Just add jdbc: prefix
+                url = "jdbc:" + url;
+            }
         }
         
         System.out.println(">>> Using JDBC URL: " + url);

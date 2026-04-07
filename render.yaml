@@ -7,6 +7,7 @@ services:
         fromDatabase:
           instance: securebank-db
           property: connectionString
+        prefix: "jdbc:"
       - key: SPRING_DATASOURCE_USERNAME
         fromDatabase:
           instance: securebank-db
