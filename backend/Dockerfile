@@ -4,6 +4,6 @@ WORKDIR /app
 
 COPY . .
 
-RUN mvn clean package -DskipTests
+RUN mvn clean dependency:resolve -U package -DskipTests
 
 CMD ["java", "-jar", "target/banking-system-1.0.0.jar"]
