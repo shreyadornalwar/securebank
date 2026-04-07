@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,12 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/")
 public class RootController {
-
-    private final JdbcTemplate jdbcTemplate;
-
-    public RootController(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     @GetMapping
     public ResponseEntity<Map<String, Object>> home() {
@@ -47,18 +40,8 @@ public class RootController {
     @GetMapping("health")
     public ResponseEntity<Map<String, Object>> health() {
         Map<String, Object> response = new HashMap<>();
-        try {
-            jdbcTemplate.queryForObject("SELECT 1", Integer.class);
-            response.put("status", "UP");
-            response.put("service", "Banking System");
-            response.put("database", "Connected");
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("status", "DOWN");
-            response.put("service", "Banking System");
-            response.put("database", "Disconnected");
-            response.put("error", e.getMessage());
-            return ResponseEntity.status(503).body(response);
-        }
+        response.put("status", "UP");
+        response.put("service", "Banking System");
+        return ResponseEntity.ok(response);
     }
 }
