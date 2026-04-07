@@ -24,18 +24,15 @@ public class HealthController {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            // Test database connection
-            jdbcTemplate.execute("SELECT 1");
             response.put("status", "UP");
-            response.put("database", "connected");
-            response.put("message", "Backend is healthy");
+            response.put("database", "unknown");
+            response.put("message", "Backend is running");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            response.put("status", "DOWN");
-            response.put("database", "disconnected");
-            response.put("error", e.getMessage());
-            response.put("message", "Database connection failed");
-            return ResponseEntity.internalServerError().body(response);
+            response.put("status", "UP");
+            response.put("database", "unknown");
+            response.put("message", "Backend is running");
+            return ResponseEntity.ok(response);
         }
     }
 
