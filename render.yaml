@@ -3,11 +3,11 @@ services:
     buildCommand: mvn clean package -DskipTests
     startCommand: java -jar target/banking-system-1.0.0.jar
     envVars:
-      - key: SPRING_DATASOURCE_URL
+      - key: DB_URL
         value: "jdbc:postgresql://dpg-d7710a8gjchc73dmkng0-a.oregon-postgres.render.com:5432/bankdb_y3zd"
-      - key: SPRING_DATASOURCE_USERNAME
+      - key: DB_USER
         value: "bankuser"
-      - key: SPRING_DATASOURCE_PASSWORD
+      - key: DB_PASS
         value: "hDmIeJMlyj8C"
       - key: MAIL_PASSWORD
         sync: false
