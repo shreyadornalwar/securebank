@@ -354,7 +354,6 @@
     container.innerHTML =
       '<div class="chatbot-toggle" id="chatbotToggle" title="Chat with ' + BOT_NAME + '">' +
         '<i class="fas fa-comment-dots"></i>' +
-        '<span class="chatbot-toggle-badge" id="chatbotBadge">1</span>' +
       '</div>' +
       '<div class="chatbot-window" id="chatbotWindow">' +
         '<div class="chatbot-header">' +
@@ -493,7 +492,6 @@
     var sendBtn = document.getElementById('chatbotSendBtn');
     var messagesContainer = document.getElementById('chatbotMessages');
     var quickRepliesContainer = document.getElementById('chatbotQuickReplies');
-    var badge = document.getElementById('chatbotBadge');
 
     renderQuickReplies(quickRepliesContainer);
 
@@ -501,7 +499,6 @@
       isOpen = true;
       window_.classList.add('open');
       toggle.classList.add('active');
-      badge.style.display = 'none';
       setTimeout(function () { input.focus(); }, 300);
     }
 
