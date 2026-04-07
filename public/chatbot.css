@@ -5,7 +5,7 @@
   position: fixed;
   bottom: 24px;
   right: 24px;
-  z-index: 9999;
+  z-index: 999;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
@@ -559,34 +559,23 @@
 }
 
 /* ===== NOTIFICATION DOT ON TOGGLE ===== */
-.chatbot-toggle::after {
-  content: '';
+.chatbot-toggle-badge {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: -4px;
+  right: -4px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  background: rgba(99, 102, 241, 0.3);
-  animation: chatbotRipple 3s infinite;
-  pointer-events: none;
+  background: #EF4444;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid white;
 }
 
-.chatbot-toggle.active::after {
+.chatbot-toggle::after {
   display: none;
-}
-
-@keyframes chatbotRipple {
-  0% {
-    transform: scale(1);
-    opacity: 0.4;
-  }
-  50% {
-    transform: scale(1.4);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 0;
-  }
 }

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+# This is a banking application, not an advertising site

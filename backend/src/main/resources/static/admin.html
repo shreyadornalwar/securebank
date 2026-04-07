@@ -1271,7 +1271,7 @@
         function showNotification(msg) {
             var n = document.createElement('div');
             n.textContent = msg;
-            n.style.cssText = 'position:fixed;top:20px;right:20px;background:#6366F1;color:#fff;padding:12px 24px;border-radius:8px;z-index:9999;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,0.15);animation:slideIn .3s ease';
+            n.style.cssText = 'position:fixed;top:20px;right:20px;background:#6366F1;color:#fff;padding:12px 24px;border-radius:8px;z-index:999;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,0.15);animation:slideIn .3s ease';
             document.body.appendChild(n);
             setTimeout(function(){ n.style.opacity='0'; n.style.transition='opacity .3s'; }, 2000);
             setTimeout(function(){ n.remove(); }, 2500);
