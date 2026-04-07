@@ -10,17 +10,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleAllExceptions(Exception ex) {
-        String message = ex.getMessage();
-        String cause = ex.getCause() != null ? ex.getCause().getMessage() : "unknown";
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                "error", "INTERNAL_ERROR",
-                "message", message != null ? message : "null",
-                "cause", cause
-        ));
-    }
-
     @ExceptionHandler(InsufficientBalanceException.class)
     public ResponseEntity<?> handleInsufficientBalance(InsufficientBalanceException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
