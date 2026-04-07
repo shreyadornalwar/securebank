@@ -3,11 +3,11 @@ services:
     buildCommand: mvn clean package -DskipTests
     startCommand: java -jar target/banking-system-1.0.0.jar
     envVars:
-      - key: DB_URL
+      - key: POSTGRES_URL
         value: "jdbc:postgresql://dpg-d7710a8gjchc73dmkng0-a.oregon-postgres.render.com:5432/bankdb_y3zd"
-      - key: DB_USER
+      - key: POSTGRES_USER
         value: "bankuser"
-      - key: DB_PASS
+      - key: POSTGRES_PASSWORD
         value: "hDmIeJMlyj8C"
       - key: MAIL_PASSWORD
         sync: false
