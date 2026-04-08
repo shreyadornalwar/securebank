@@ -2,6 +2,7 @@ package com.bank.repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -156,5 +157,55 @@ public class JdbcAccountRepository implements AccountRepository {
         t.setStatus(rs.getString("status"));
         t.setDescription(rs.getString("description"));
         return t;
+    }
+
+    public void archiveTransaction(Transaction transaction) {
+        jdbcTemplate.update(
+                "INSERT INTO archived_transactions (id, account_id, type, amount, date, time, status, description, original_transaction_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "ARCH_" + transaction.getId(),
+                transaction.getAccountId(),
+                transaction.getType(),
+                transaction.getAmount(),
+                transaction.getDate(),
+                transaction.getTime(),
+                transaction.getStatus(),
+                transaction.getDescription(),
+                transaction.getId());
+    }
+
+    public List<Transaction> findTransactionsOlderThan(int days) {
+        LocalDateTime cutoffDate = LocalDateTime.now().minusDays(days);
+        String cutoffDateStr = cutoffDate.toLocalDate().toString();
+        return jdbcTemplate.query(
+                "SELECT id, account_id, type, amount, date, time, status, description FROM transactions WHERE date < ? ORDER BY date DESC, time DESC",
+                this::mapRowToTransaction, cutoffDateStr);
+    }
+
+    public void deleteTransaction(String id) {
+        jdbcTemplate.update("DELETE FROM transactions WHERE id = ?", id);
+    }
+
+    public int archiveOldTransactions(int daysOld) {
+        List<Transaction> oldTransactions = findTransactionsOlderThan(daysOld);
+        int archivedCount = 0;
+
+        for (Transaction t : oldTransactions) {
+            try {
+                archiveTransaction(t);
+                deleteTransaction(t.getId());
+                archivedCount++;
+            } catch (Exception e) {
+                log.error("Failed to archive transaction {}: {}", t.getId(), e.getMessage());
+            }
+        }
+
+        log.info("Archived {} old transactions (older than {} days)", archivedCount, daysOld);
+        return archivedCount;
+    }
+
+    public List<Transaction> findArchivedTransactionsByAccountId(int accountId) {
+        return jdbcTemplate.query(
+                "SELECT id, account_id, type, amount, date, time, status, description FROM archived_transactions WHERE account_id = ? ORDER BY date DESC, time DESC",
+                this::mapRowToTransaction, accountId);
     }
 }

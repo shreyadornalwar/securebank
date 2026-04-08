@@ -90,3 +90,20 @@ CREATE INDEX IF NOT EXISTS idx_beneficiaries_user_id ON beneficiaries(user_id);
 CREATE INDEX IF NOT EXISTS idx_cards_user_id ON cards(user_id);
 CREATE INDEX IF NOT EXISTS idx_loans_user_id ON loans(user_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id);
+
+-- Archived transactions table (for old data storage)
+CREATE TABLE IF NOT EXISTS archived_transactions (
+    id VARCHAR(50) PRIMARY KEY,
+    account_id INT,
+    type VARCHAR(20) NOT NULL,
+    amount DECIMAL(15,2) NOT NULL,
+    date VARCHAR(10) NOT NULL,
+    time VARCHAR(10) NOT NULL,
+    status VARCHAR(20) DEFAULT 'completed',
+    description TEXT,
+    archived_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    original_transaction_id VARCHAR(50)
+);
+
+CREATE INDEX IF NOT EXISTS idx_archived_transactions_account_id ON archived_transactions(account_id);
+CREATE INDEX IF NOT EXISTS idx_archived_transactions_date ON archived_transactions(date);

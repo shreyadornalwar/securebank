@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.bank.model.Account;
@@ -23,7 +24,7 @@ public class EmailService {
     private static final Logger log = LoggerFactory.getLogger(EmailService.class);
     private static final double DEFAULT_LOW_BALANCE_THRESHOLD = 500.0;
 
-    @Autowired(required = false)
+    @Autowired
     private JavaMailSender mailSender;
 
     @Autowired
@@ -370,5 +371,67 @@ public class EmailService {
 
     public double getDefaultLowBalanceThreshold() {
         return DEFAULT_LOW_BALANCE_THRESHOLD;
+    }
+
+    @Scheduled(fixedRate = 3600000)
+    public void checkAndSendLowBalanceAlerts() {
+        log.info("[SCHEDULED] Starting automatic low balance alert check...");
+        if (mailSender == null) {
+            log.warn("[SCHEDULED] Mail not configured, skipping low balance alert check");
+            return;
+        }
+        try {
+            List<Account> accounts = repository.findAll();
+            double threshold = getDefaultLowBalanceThreshold();
+            int alertsSent = 0;
+
+            for (Account account : accounts) {
+                if (account.getBalance() < threshold) {
+                    String email = repository.findEmailByAccountId(account.getId());
+                    if (email != null && !email.isBlank()) {
+                        sendLowBalanceAlert(account.getId(), account.getBalance(), threshold);
+                        alertsSent++;
+                    }
+                }
+            }
+            log.info("[SCHEDULED] Low balance alert check completed. Sent {} alerts", alertsSent);
+        } catch (Exception e) {
+            log.error("[SCHEDULED] Failed to check low balance alerts: {}", e.getMessage());
+        }
+    }
+
+    @Scheduled(cron = "0 0 6 * * ?")
+    public void sendDailyTransactionSummaries() {
+        log.info("[SCHEDULED] Starting daily transaction summary send...");
+        if (mailSender == null) {
+            log.warn("[SCHEDULED] Mail not configured, skipping daily summary");
+            return;
+        }
+        try {
+            List<Account> accounts = repository.findAll();
+            int summariesSent = 0;
+
+            for (Account account : accounts) {
+                String email = repository.findEmailByAccountId(account.getId());
+                if (email != null && !email.isBlank()) {
+                    sendTransactionSummary(account.getId());
+                    summariesSent++;
+                }
+            }
+            log.info("[SCHEDULED] Daily summary completed. Sent {} summaries", summariesSent);
+        } catch (Exception e) {
+            log.error("[SCHEDULED] Failed to send daily summaries: {}", e.getMessage());
+        }
+    }
+
+    @Scheduled(cron = "0 30 2 * * ?")
+    public void archiveOldTransactions() {
+        log.info("[SCHEDULED] Starting transaction archival...");
+        try {
+            int archived = repository.archiveOldTransactions(90);
+            log.info("[SCHEDULED] Transaction archival completed. Archived {} transactions", archived);
+        } catch (Exception e) {
+            log.error("[SCHEDULED] Failed to archive transactions: {}", e.getMessage());
+        }
     }
 }

@@ -15,4 +15,6 @@ public interface AccountRepository {
     void update(Account account);
 
     void delete(int id);
+
+    int archiveOldTransactions(int daysOld);
 }
