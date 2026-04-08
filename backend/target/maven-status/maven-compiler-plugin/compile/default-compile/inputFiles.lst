@@ -3,6 +3,7 @@ C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\c
 C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\config\DatabaseInitializer.java
 C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\config\JwtAuthFilter.java
 C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\config\JwtUtil.java
+C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\config\MailConfig.java
 C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\config\SecurityConfig.java
 C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\config\WebSocketConfig.java
 C:\Users\dorna\OneDrive\Desktop\23r21a2145\bank\backend\src\main\java\com\bank\controller\AccountController.java
