@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bank.model.Account;
-import com.bank.service.AccountService;
-import com.bank.service.EmailService;
 
 @RestController
 @RequestMapping("/api/email")
@@ -41,7 +39,8 @@ public class EmailController {
     public ResponseEntity<?> testEmail() {
         try {
             log.info("=== TEST EMAIL ENDPOINT CALLED ===");
-            log.info("MailSender bean status: {}", mailSender);
+            log.info("MailSender bean: {}", mailSender);
+            log.info("MailSender class: {}", mailSender != null ? mailSender.getClass().getName() : "NULL");
             
             if (mailSender == null) {
                 return ResponseEntity.badRequest().body(Map.of("success", false, "message", "JavaMailSender is NULL! Check Spring Boot mail dependency."));
@@ -51,15 +50,15 @@ public class EmailController {
             msg.setTo("shreyadornalwar@gmail.com");
             msg.setFrom("shreyadornalwar@gmail.com");
             msg.setSubject("TEST EMAIL - SecureBank");
-            msg.setText("This is a test email from SecureBank backend at: " + java.time.LocalDateTime.now());
+            msg.setText("This is a test email from SecureBank at " + java.time.LocalDateTime.now() + "\n\nIf you receive this, email is working!");
             
             log.info("Attempting to send test email...");
             mailSender.send(msg);
-            log.info("Test email SENT successfully!");
+            log.info("TEST EMAIL SENT SUCCESSFULLY!");
             
-            return ResponseEntity.ok(Map.of("success", true, "message", "Test email sent to shreyadornalwar@gmail.com"));
+            return ResponseEntity.ok(Map.of("success", true, "message", "Test email sent - check your inbox!"));
         } catch (Exception e) {
-            log.error("TEST EMAIL FAILED: {}", e.getMessage(), e);
+            log.error("TEST EMAIL FAILED: {} - {}", e.getClass().getSimpleName(), e.getMessage(), e);
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Email failed: " + e.getMessage()));
         }
     }
