@@ -34,14 +34,18 @@ public class EmailService {
 
     @Async
     public void sendTransactionEmail(int accountId, String transactionType, double amount, double newBalance) {
+        log.info("[EMAIL] Starting sendTransactionEmail for accountId={}, type={}, amount={}", accountId, transactionType, amount);
+        
         if (mailSender == null) {
-            log.debug("[EMAIL] Mail not configured, skipping transaction email for account {}", accountId);
+            log.error("[EMAIL] FATAL: MailSender is NULL - Spring Mail not configured!");
             return;
         }
         try {
             String email = repository.findEmailByAccountId(accountId);
+            log.info("[EMAIL] Retrieved email {} for accountId={}", email, accountId);
+            
             if (email == null || email.isBlank()) {
-                log.warn("[EMAIL] No email found for account ID: {}", accountId);
+                log.warn("[EMAIL] No email found for account ID: {}. User may not have an email set.", accountId);
                 return;
             }
 
