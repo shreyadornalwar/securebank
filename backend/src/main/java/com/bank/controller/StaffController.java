@@ -24,7 +24,7 @@ public class StaffController {
     public ResponseEntity<?> getStaff() {
         try {
             List<Map<String, Object>> staff = jdbcTemplate.query(
-                    "SELECT id, name, email, role, department, status FROM staff",
+                    "SELECT u.id, u.first_name || ' ' || u.last_name as name, u.email, u.role, 'Operations' as department, 'ACTIVE' as status FROM users u WHERE u.role = 'staff'",
                     (rs, rowNum) -> {
                         Map<String, Object> s = new HashMap<>();
                         s.put("id", rs.getInt("id"));
@@ -37,6 +37,7 @@ public class StaffController {
                     });
             return ResponseEntity.ok(staff);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.internalServerError().body(java.util.List.of());
         }
     }
