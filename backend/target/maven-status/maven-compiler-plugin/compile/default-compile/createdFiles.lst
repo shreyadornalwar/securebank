@@ -3,7 +3,9 @@ com\bank\model\LoginRequest.class
 com\bank\repository\AccountRepository.class
 com\bank\util\FileLogger.class
 com\bank\config\CorsConfig.class
+com\bank\controller\TestController.class
 com\bank\config\JwtAuthFilter.class
+com\bank\controller\DebugController.class
 com\bank\service\CardService.class
 com\bank\controller\RootController.class
 com\bank\exception\GlobalExceptionHandler.class
@@ -18,6 +20,7 @@ com\bank\service\LoanService$LoanActivityDTO.class
 com\bank\repository\JdbcAccountRepository.class
 com\bank\service\BeneficiaryService.class
 com\bank\controller\AccountController.class
+com\bank\config\DatabaseConfigLogger.class
 com\bank\controller\CardController.class
 com\bank\controller\TransactionController.class
 com\bank\config\DatabaseInitializer.class
@@ -28,6 +31,7 @@ com\bank\Main.class
 com\bank\service\TransactionService.class
 com\bank\controller\EmailController.class
 com\bank\service\AccountService.class
+com\bank\controller\HealthController.class
 com\bank\controller\AuthController.class
 com\bank\controller\WebSocketController.class
 com\bank\service\NotificationService$NotificationDTO.class

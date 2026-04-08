@@ -29,6 +29,16 @@ public class EmailController {
         this.accountService = accountService;
     }
 
+    @GetMapping("/test")
+    public ResponseEntity<?> testEmail() {
+        try {
+            emailService.sendAccountCreatedEmail(999, "Test User", "shreyadornalwar@gmail.com", 1000.0);
+            return ResponseEntity.ok(Map.of("success", true, "message", "Test email triggered"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        }
+    }
+
     /**
      * POST /api/email/balance-alert
      * Sends a balance alert email for a specific account.
