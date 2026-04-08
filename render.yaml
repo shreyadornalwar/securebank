@@ -3,7 +3,13 @@ services:
     buildCommand: mvn clean dependency:resolve -U package -DskipTests
     startCommand: java -jar target/banking-system-1.0.0.jar
     envVars:
-      - key: MAIL_PASSWORD
-        sync: false
+      - key: SPRING_MAIL_HOST
+        value: smtp.gmail.com
+      - key: SPRING_MAIL_PORT
+        value: "587"
+      - key: SPRING_MAIL_USERNAME
+        value: shreyadornalwar@gmail.com
+      - key: SPRING_MAIL_PASSWORD
+        value: "scxs rbrf hyts rgus"
       - key: PORT
         value: "8080"
