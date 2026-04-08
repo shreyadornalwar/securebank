@@ -42,6 +42,9 @@ public class EmailService {
         }
         try {
             String email = repository.findEmailByAccountId(accountId);
+            if (email == null || email.isBlank()) {
+                email = repository.findEmailFromAccount(accountId);
+            }
             log.info("[EMAIL] Retrieved email {} for accountId={}", email, accountId);
             
             if (email == null || email.isBlank()) {

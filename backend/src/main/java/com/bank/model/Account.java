@@ -7,6 +7,7 @@ public class Account {
     private double balance;
     private String type;
     private String status;
+    private String email;
 
     public Account() {
         this.id = 0;
@@ -70,6 +71,14 @@ public class Account {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getAccountId() {

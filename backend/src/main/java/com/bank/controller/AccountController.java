@@ -169,6 +169,7 @@ public class AccountController {
         map.put("type", account.getType());
         map.put("balance", account.getBalance());
         map.put("status", account.getStatus());
+        map.put("email", account.getEmail());
         return map;
     }
 

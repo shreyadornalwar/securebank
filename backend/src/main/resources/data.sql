@@ -1,6 +1,6 @@
 -- SecureBank Initial Data (H2 compatible)
 
--- Insert default users
+-- Insert default users with emails
 INSERT INTO users (first_name, last_name, email, password, role, account_id) 
 SELECT 'John', 'Doe', 'john@example.com', 'password123', 'customer', 1
 WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'john@example.com');
@@ -22,16 +22,16 @@ SELECT 'Staff', 'Member', 'staff@securebank.com', 'staff123', 'staff', NULL
 WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'staff@securebank.com');
 
 -- Insert accounts
-INSERT INTO accounts (id, name, type, balance, status) 
-SELECT 1, 'John Doe', 'SAVINGS', 5000.00, 'ACTIVE'
+INSERT INTO accounts (id, name, type, balance, status, email) 
+SELECT 1, 'John Doe', 'SAVINGS', 5000.00, 'ACTIVE', 'john@example.com'
 WHERE NOT EXISTS (SELECT 1 FROM accounts WHERE id = 1);
 
-INSERT INTO accounts (id, name, type, balance, status) 
-SELECT 2, 'Jane Smith', 'CHECKING', 2500.00, 'ACTIVE'
+INSERT INTO accounts (id, name, type, balance, status, email) 
+SELECT 2, 'Jane Smith', 'CHECKING', 2500.00, 'ACTIVE', 'jane@example.com'
 WHERE NOT EXISTS (SELECT 1 FROM accounts WHERE id = 2);
 
-INSERT INTO accounts (id, name, type, balance, status) 
-SELECT 3, 'Customer User', 'SAVINGS', 1000.00, 'ACTIVE'
+INSERT INTO accounts (id, name, type, balance, status, email) 
+SELECT 3, 'Customer User', 'SAVINGS', 1000.00, 'ACTIVE', 'customer@securebank.com'
 WHERE NOT EXISTS (SELECT 1 FROM accounts WHERE id = 3);
 
 -- Insert transactions

@@ -26,17 +26,18 @@ public class JdbcAccountRepository implements AccountRepository {
 
     @Override
     public void create(Account account) {
-        jdbcTemplate.update("INSERT INTO accounts (id, name, balance, type, status) VALUES (?, ?, ?, ?, ?)",
+        jdbcTemplate.update("INSERT INTO accounts (id, name, balance, type, status, email) VALUES (?, ?, ?, ?, ?, ?)",
                 account.getId(), account.getName(), account.getBalance(),
                 account.getType() != null ? account.getType() : "SAVINGS",
-                account.getStatus() != null ? account.getStatus() : "ACTIVE");
+                account.getStatus() != null ? account.getStatus() : "ACTIVE",
+                account.getEmail());
     }
 
     @Override
     public List<Account> findAll() {
         log.info("JdbcAccountRepository.findAll() called");
         try {
-            return jdbcTemplate.query("SELECT id, name, balance, type, status FROM accounts",
+            return jdbcTemplate.query("SELECT id, name, balance, type, status, email FROM accounts",
                     this::mapRowToAccount);
         } catch (Exception e) {
             log.error("Error in findAll: {}", e.getMessage(), e);
@@ -61,9 +62,9 @@ public class JdbcAccountRepository implements AccountRepository {
     @Override
     public void update(Account account) {
         int updated = jdbcTemplate.update(
-                "UPDATE accounts SET name = ?, balance = ?, type = ?, status = ? WHERE id = ?",
+                "UPDATE accounts SET name = ?, balance = ?, type = ?, status = ?, email = ? WHERE id = ?",
                 account.getName(), account.getBalance(),
-                account.getType(), account.getStatus(), account.getId());
+                account.getType(), account.getStatus(), account.getEmail(), account.getId());
         if (updated == 0) {
             throw new IllegalArgumentException("No account found with id=" + account.getId());
         }
@@ -104,6 +105,13 @@ public class JdbcAccountRepository implements AccountRepository {
         return results.isEmpty() ? null : results.get(0);
     }
 
+    public String findEmailFromAccount(int accountId) {
+        List<String> results = jdbcTemplate.query(
+                "SELECT email FROM accounts WHERE id = ?",
+                (rs, rowNum) -> rs.getString("email"), accountId);
+        return results.isEmpty() ? null : results.get(0);
+    }
+
     public void createUserForAccount(int accountId, String name, String email) {
         createUserForAccount(accountId, name, email, "changeme");
     }
@@ -138,12 +146,14 @@ public class JdbcAccountRepository implements AccountRepository {
     }
 
     private Account mapRowToAccount(ResultSet rs, int rowNum) throws SQLException {
-        return new Account(
+        Account account = new Account(
                 rs.getInt("id"),
                 rs.getString("name"),
                 rs.getDouble("balance"),
                 rs.getString("type"),
                 rs.getString("status"));
+        account.setEmail(rs.getString("email"));
+        return account;
     }
 
     private Transaction mapRowToTransaction(ResultSet rs, int rowNum) throws SQLException {

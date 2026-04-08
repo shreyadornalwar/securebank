@@ -29,12 +29,14 @@ public class AccountService {
 
     public void createAccount(int id, String name, double balance, String type, String email) {
         Account account = new Account(id, name, balance, type, "ACTIVE");
+        account.setEmail(email);
         repository.create(account);
         repository.createUserForAccount(id, name, email);
     }
 
     public void createAccount(int id, String name, double balance, String type, String email, String password) {
         Account account = new Account(id, name, balance, type, "ACTIVE");
+        account.setEmail(email);
         repository.create(account);
         repository.createUserForAccount(id, name, email, password);
     }
