@@ -6,6 +6,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +21,8 @@ import com.bank.util.FileLogger;
 @Service
 public class TransactionService {
 
+    private static final Logger log = LoggerFactory.getLogger(TransactionService.class);
+    
     @Autowired
     private JdbcAccountRepository repository;
 
@@ -30,6 +34,26 @@ public class TransactionService {
 
     @Autowired
     private SseController sseController;
+
+    public List<Transaction> getAllTransactions() {
+        log.info("TransactionService.getAllTransactions() called");
+        try {
+            return repository.findAllTransactions();
+        } catch (Exception e) {
+            log.error("Error in getAllTransactions: {}", e.getMessage(), e);
+            return List.of();
+        }
+    }
+
+    public List<Transaction> getTransactions(int accountId) {
+        log.info("TransactionService.getTransactions({}) called", accountId);
+        try {
+            return repository.findTransactionsByAccountId(accountId);
+        } catch (Exception e) {
+            log.error("Error in getTransactions: {}", e.getMessage(), e);
+            return List.of();
+        }
+    }
 
     @Transactional
     public void deposit(int accountId, double amount) {

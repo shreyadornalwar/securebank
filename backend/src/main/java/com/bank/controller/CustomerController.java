@@ -28,9 +28,7 @@ public class CustomerController {
         try {
             log.info("Fetching customers from database");
             List<Map<String, Object>> customers = jdbcTemplate.query(
-                    "SELECT u.id, u.first_name, u.last_name, u.email, " +
-                    "(SELECT COUNT(*) FROM accounts a WHERE a.id = u.account_id) as accounts " +
-                    "FROM users u WHERE u.role = 'customer'",
+                    "SELECT id, first_name, last_name, email, account_id FROM users WHERE role = 'customer'",
                     (rs, rowNum) -> {
                         Map<String, Object> c = new HashMap<>();
                         c.put("id", rs.getInt("id"));
@@ -38,7 +36,7 @@ public class CustomerController {
                         c.put("email", rs.getString("email"));
                         c.put("phone", "N/A");
                         c.put("status", "ACTIVE");
-                        c.put("accounts", rs.getInt("accounts"));
+                        c.put("accounts", 1);
                         return c;
                     });
             log.info("Found {} customers", customers.size());

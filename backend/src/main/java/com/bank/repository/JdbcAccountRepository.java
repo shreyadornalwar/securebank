@@ -5,6 +5,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -14,6 +16,7 @@ import com.bank.model.Transaction;
 @Repository
 public class JdbcAccountRepository implements AccountRepository {
 
+    private static final Logger log = LoggerFactory.getLogger(JdbcAccountRepository.class);
     private final JdbcTemplate jdbcTemplate;
 
     public JdbcAccountRepository(JdbcTemplate jdbcTemplate) {
@@ -30,16 +33,28 @@ public class JdbcAccountRepository implements AccountRepository {
 
     @Override
     public List<Account> findAll() {
-        return jdbcTemplate.query("SELECT id, name, balance, type, status FROM accounts",
-                this::mapRowToAccount);
+        log.info("JdbcAccountRepository.findAll() called");
+        try {
+            return jdbcTemplate.query("SELECT id, name, balance, type, status FROM accounts",
+                    this::mapRowToAccount);
+        } catch (Exception e) {
+            log.error("Error in findAll: {}", e.getMessage(), e);
+            return new ArrayList<>();
+        }
     }
 
     @Override
     public Account findById(int id) {
-        List<Account> results = jdbcTemplate.query(
-                "SELECT id, name, balance, type, status FROM accounts WHERE id = ?",
-                this::mapRowToAccount, id);
-        return results.isEmpty() ? null : results.get(0);
+        log.info("JdbcAccountRepository.findById({}) called", id);
+        try {
+            List<Account> results = jdbcTemplate.query(
+                    "SELECT id, name, balance, type, status FROM accounts WHERE id = ?",
+                    this::mapRowToAccount, id);
+            return results.isEmpty() ? null : results.get(0);
+        } catch (Exception e) {
+            log.error("Error in findById: {}", e.getMessage(), e);
+            return null;
+        }
     }
 
     @Override

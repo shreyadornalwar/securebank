@@ -2,6 +2,8 @@ package com.bank.service;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +15,7 @@ import com.bank.repository.JdbcAccountRepository;
 @Service
 public class AccountService {
 
+    private static final Logger log = LoggerFactory.getLogger(AccountService.class);
     private final JdbcAccountRepository repository;
 
     public AccountService(JdbcAccountRepository repository) {
@@ -37,10 +40,12 @@ public class AccountService {
     }
 
     public List<Account> listAccounts() {
+        log.info("AccountService.listAccounts() called");
         return repository.findAll();
     }
 
     public Account getAccountById(int id) {
+        log.info("AccountService.getAccountById({}) called", id);
         return repository.findById(id);
     }
 
