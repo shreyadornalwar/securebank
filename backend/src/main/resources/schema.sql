@@ -1,22 +1,21 @@
--- SecureBank Database Schema
--- This script initializes all required tables for the banking system
+-- SecureBank Database Schema (H2 compatible)
 
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
-    id SERIAL PRIMARY KEY,
+    id INT PRIMARY KEY AUTO_INCREMENT,
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     role VARCHAR(20) NOT NULL DEFAULT 'customer',
-    account_id INTEGER,
+    account_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Accounts table
 CREATE TABLE IF NOT EXISTS accounts (
-    id SERIAL PRIMARY KEY,
+    id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
     balance DECIMAL(15,2) NOT NULL DEFAULT 0.00,
     type VARCHAR(20) NOT NULL DEFAULT 'SAVINGS',
@@ -28,7 +27,7 @@ CREATE TABLE IF NOT EXISTS accounts (
 -- Transactions table
 CREATE TABLE IF NOT EXISTS transactions (
     id VARCHAR(50) PRIMARY KEY,
-    account_id INTEGER REFERENCES accounts(id),
+    account_id INT,
     type VARCHAR(20) NOT NULL,
     amount DECIMAL(15,2) NOT NULL,
     date VARCHAR(10) NOT NULL,
@@ -39,8 +38,8 @@ CREATE TABLE IF NOT EXISTS transactions (
 
 -- Beneficiaries table
 CREATE TABLE IF NOT EXISTS beneficiaries (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id),
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
     beneficiary_account_number VARCHAR(20) NOT NULL,
     beneficiary_name VARCHAR(255) NOT NULL,
     beneficiary_bank VARCHAR(255),
@@ -50,8 +49,8 @@ CREATE TABLE IF NOT EXISTS beneficiaries (
 
 -- Cards table
 CREATE TABLE IF NOT EXISTS cards (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id),
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
     card_number VARCHAR(20) UNIQUE NOT NULL,
     card_type VARCHAR(20) DEFAULT 'debit',
     expiry_date VARCHAR(5),
@@ -62,27 +61,27 @@ CREATE TABLE IF NOT EXISTS cards (
 
 -- Loans table
 CREATE TABLE IF NOT EXISTS loans (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id),
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
     loan_type VARCHAR(50) NOT NULL,
     amount DECIMAL(15,2) NOT NULL,
     interest_rate DECIMAL(5,2),
-    term_months INTEGER,
+    term_months INT,
     status VARCHAR(20) DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Notifications table
 CREATE TABLE IF NOT EXISTS notifications (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id),
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
     message TEXT NOT NULL,
     type VARCHAR(50),
-    read BOOLEAN DEFAULT FALSE,
+    read_status BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create indexes for better performance
+-- Create indexes
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
 CREATE INDEX IF NOT EXISTS idx_accounts_name ON accounts(name);
