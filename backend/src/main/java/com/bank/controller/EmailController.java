@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bank.model.Account;
+import com.bank.service.AccountService;
+import com.bank.service.EmailService;
 
 @RestController
 @RequestMapping("/api/email")
