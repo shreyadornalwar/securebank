@@ -28,9 +28,6 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/login").permitAll()
-                .requestMatchers("/api/auth/google").permitAll()
-                .requestMatchers("/login/oauth2/**").permitAll()
-                .requestMatchers("/oauth2/**").permitAll()
                 .requestMatchers("/").permitAll()
                 .requestMatchers("/health").permitAll()
                 .requestMatchers("/api/health").permitAll()
