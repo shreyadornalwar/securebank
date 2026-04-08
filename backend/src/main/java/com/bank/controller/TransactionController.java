@@ -51,8 +51,8 @@ public class TransactionController {
         try {
             Integer accountId = toInt(request.get("accountId"));
             double amount = toDouble(request.get("amount"));
-            transactionService.deposit(accountId, amount);
-            return ResponseEntity.ok(Map.of("success", true));
+            Map<String, Object> result = transactionService.deposit(accountId, amount);
+            return ResponseEntity.ok(Map.of("success", true, "emailSent", result.getOrDefault("emailSent", false)));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
         }
@@ -63,8 +63,8 @@ public class TransactionController {
         try {
             Integer accountId = toInt(request.get("accountId"));
             double amount = toDouble(request.get("amount"));
-            transactionService.withdraw(accountId, amount);
-            return ResponseEntity.ok(Map.of("success", true));
+            Map<String, Object> result = transactionService.withdraw(accountId, amount);
+            return ResponseEntity.ok(Map.of("success", true, "emailSent", result.getOrDefault("emailSent", false)));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
         }
@@ -76,8 +76,8 @@ public class TransactionController {
             Integer fromId = toInt(request.get("accountId"));
             Integer toId = toInt(request.get("recipientId"));
             double amount = toDouble(request.get("amount"));
-            transactionService.transfer(fromId, toId, amount);
-            return ResponseEntity.ok(Map.of("success", true));
+            Map<String, Object> result = transactionService.transfer(fromId, toId, amount);
+            return ResponseEntity.ok(Map.of("success", true, "emailSent", result.getOrDefault("emailSent", false)));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
         }

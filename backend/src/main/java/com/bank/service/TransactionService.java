@@ -56,32 +56,58 @@ public class TransactionService {
     }
 
     @Transactional
-    public void deposit(int accountId, double amount) {
+    public Map<String, Object> deposit(int accountId, double amount) {
         accountService.deposit(accountId, amount);
         Transaction txn = recordTransaction(accountId, "DEPOSIT", amount);
         FileLogger.logTransaction(txn);
         Account account = repository.findById(accountId);
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("transaction", txn);
+        
         if (account != null) {
-            emailService.sendTransactionEmail(accountId, "DEPOSIT", amount, account.getBalance());
+            try {
+                emailService.sendTransactionEmail(accountId, "DEPOSIT", amount, account.getBalance());
+                result.put("emailSent", true);
+            } catch (Exception e) {
+                log.warn("Email send failed for deposit: {}", e.getMessage());
+                result.put("emailSent", false);
+                result.put("emailError", e.getMessage());
+            }
             broadcastTransactionUpdate(txn, account);
         }
+        
+        return result;
     }
 
     @Transactional
-    public void withdraw(int accountId, double amount) {
+    public Map<String, Object> withdraw(int accountId, double amount) {
         accountService.withdraw(accountId, amount);
         Transaction txn = recordTransaction(accountId, "WITHDRAWAL", -amount);
         FileLogger.logTransaction(txn);
         Account account = repository.findById(accountId);
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("transaction", txn);
+        
         if (account != null) {
-            emailService.sendTransactionEmail(accountId, "WITHDRAWAL", amount, account.getBalance());
+            try {
+                emailService.sendTransactionEmail(accountId, "WITHDRAWAL", amount, account.getBalance());
+                result.put("emailSent", true);
+            } catch (Exception e) {
+                log.warn("Email send failed for withdrawal: {}", e.getMessage());
+                result.put("emailSent", false);
+                result.put("emailError", e.getMessage());
+            }
             checkAndSendLowBalanceAlert(account);
             broadcastTransactionUpdate(txn, account);
         }
+        
+        return result;
     }
 
     @Transactional
-    public void transfer(int fromId, int toId, double amount) {
+    public Map<String, Object> transfer(int fromId, int toId, double amount) {
         accountService.transfer(fromId, toId, amount);
         Transaction fromTxn = recordTransaction(fromId, "TRANSFER_OUT", -amount);
         Transaction toTxn = recordTransaction(toId, "TRANSFER_IN", amount);
@@ -90,16 +116,34 @@ public class TransactionService {
 
         Account fromAccount = repository.findById(fromId);
         Account toAccount = repository.findById(toId);
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("fromTransaction", fromTxn);
+        result.put("toTransaction", toTxn);
+        boolean emailSent = false;
 
         if (fromAccount != null) {
-            emailService.sendTransactionEmail(fromId, "TRANSFER_OUT", amount, fromAccount.getBalance());
+            try {
+                emailService.sendTransactionEmail(fromId, "TRANSFER_OUT", amount, fromAccount.getBalance());
+                emailSent = true;
+            } catch (Exception e) {
+                log.warn("Email send failed for transfer out: {}", e.getMessage());
+            }
             checkAndSendLowBalanceAlert(fromAccount);
             broadcastTransactionUpdate(fromTxn, fromAccount);
         }
         if (toAccount != null) {
-            emailService.sendTransactionEmail(toId, "TRANSFER_IN", amount, toAccount.getBalance());
+            try {
+                emailService.sendTransactionEmail(toId, "TRANSFER_IN", amount, toAccount.getBalance());
+                emailSent = true;
+            } catch (Exception e) {
+                log.warn("Email send failed for transfer in: {}", e.getMessage());
+            }
             broadcastTransactionUpdate(toTxn, toAccount);
         }
+        
+        result.put("emailSent", emailSent);
+        return result;
     }
 
     private Transaction recordTransaction(int accountId, String type, double amount) {
