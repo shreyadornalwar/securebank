@@ -10,7 +10,7 @@ services:
       - key: SPRING_MAIL_USERNAME
         value: shreyadornalwar@gmail.com
       - key: SPRING_MAIL_PASSWORD
-        value: "scxs rbrf hyts"
+        value: "ceyk scxs rbrf hyts"
       - key: PORT
         value: "8080"
       - key: DATABASE_URL
