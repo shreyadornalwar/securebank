@@ -7,6 +7,7 @@ KEY(email)
 VALUES 
     ('John', 'Doe', 'john@example.com', 'password123', 'customer', 1),
     ('Jane', 'Smith', 'jane@example.com', 'password123', 'customer', 2),
+    ('Customer', 'User', 'customer@securebank.com', 'customer123', 'customer', 3),
     ('Admin', 'User', 'admin@securebank.com', 'admin123', 'admin', NULL),
     ('Staff', 'Member', 'staff@securebank.com', 'staff123', 'staff', NULL);
 
@@ -15,7 +16,8 @@ MERGE INTO accounts (id, name, type, balance, status)
 KEY(id)
 VALUES 
     (1, 'John Doe', 'SAVINGS', 5000.00, 'ACTIVE'),
-    (2, 'Jane Smith', 'CHECKING', 2500.00, 'ACTIVE');
+    (2, 'Jane Smith', 'CHECKING', 2500.00, 'ACTIVE'),
+    (3, 'Customer User', 'SAVINGS', 1000.00, 'ACTIVE');
 
 -- Insert some sample transactions
 MERGE INTO transactions (id, account_id, type, amount, date, time, description, status)

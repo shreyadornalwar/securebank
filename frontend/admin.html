@@ -660,6 +660,7 @@
                 });
                 if (response.ok) {
                     customers = await response.json();
+                    localStorage.setItem('bankCustomers', JSON.stringify(customers));
                     return;
                 }
             } catch (e) {}
@@ -673,6 +674,7 @@
                 });
                 if (response.ok) {
                     staffMembers = await response.json();
+                    localStorage.setItem('bankStaff', JSON.stringify(staffMembers));
                     return;
                 }
             } catch (e) {}
