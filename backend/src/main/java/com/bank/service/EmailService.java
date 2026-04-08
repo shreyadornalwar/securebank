@@ -66,10 +66,10 @@ public class EmailService {
 
     // ==================== NEW: Account Created Email ====================
 
-    @Async
     public void sendAccountCreatedEmail(int accountId, String name, String email, double initialBalance) {
+        log.info("[EMAIL] Attempting to send account created email to: {}", email);
         if (mailSender == null) {
-            log.debug("[EMAIL] Mail not configured, skipping account created email");
+            log.error("[EMAIL] FATAL: JavaMailSender is NULL - Spring Mail not configured properly!");
             return;
         }
         try {
@@ -107,8 +107,9 @@ public class EmailService {
             message.setTo(email);
             message.setSubject(subject);
             message.setText(body);
-            message.setFrom("noreply@securebank.com");
+            message.setFrom("shreyadornalwar@gmail.com");
 
+            log.info("[EMAIL] Sending email from shreyadornalwar@gmail.com to {}", email);
             mailSender.send(message);
             log.info("[EMAIL] Account created email SENT to {} for account {}", email, formattedAccountId);
         } catch (Exception e) {
