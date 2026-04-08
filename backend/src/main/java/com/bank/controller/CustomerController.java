@@ -3,8 +3,9 @@ package com.bank.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/customers")
 public class CustomerController {
 
+    private static final Logger log = LoggerFactory.getLogger(CustomerController.class);
     private final JdbcTemplate jdbcTemplate;
 
     public CustomerController(JdbcTemplate jdbcTemplate) {
@@ -24,6 +26,7 @@ public class CustomerController {
     @GetMapping
     public ResponseEntity<?> getCustomers() {
         try {
+            log.info("Fetching customers from database");
             List<Map<String, Object>> customers = jdbcTemplate.query(
                     "SELECT u.id, u.first_name, u.last_name, u.email, " +
                     "(SELECT COUNT(*) FROM accounts a WHERE a.id = u.account_id) as accounts " +
@@ -38,10 +41,11 @@ public class CustomerController {
                         c.put("accounts", rs.getInt("accounts"));
                         return c;
                     });
+            log.info("Found {} customers", customers.size());
             return ResponseEntity.ok(customers);
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().body(java.util.List.of());
+            log.error("Error fetching customers: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
         }
     }
 }

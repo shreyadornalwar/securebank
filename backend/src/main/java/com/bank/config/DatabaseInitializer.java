@@ -16,30 +16,30 @@ public class DatabaseInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         try {
-            // Initialize schema
             jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS users (" +
-                "id SERIAL PRIMARY KEY, first_name VARCHAR(100) NOT NULL, last_name VARCHAR(100) NOT NULL, " +
+                "id INT PRIMARY KEY AUTO_INCREMENT, first_name VARCHAR(100) NOT NULL, last_name VARCHAR(100) NOT NULL, " +
                 "email VARCHAR(255) UNIQUE NOT NULL, password VARCHAR(255) NOT NULL, " +
-                "role VARCHAR(20) NOT NULL DEFAULT 'customer', account_id INTEGER)");
+                "role VARCHAR(20) NOT NULL DEFAULT 'customer', account_id INT)");
             
             jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS accounts (" +
-                "id SERIAL PRIMARY KEY, name VARCHAR(255) NOT NULL, balance DECIMAL(15,2) NOT NULL DEFAULT 0.00, " +
+                "id INT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(255) NOT NULL, balance DECIMAL(15,2) NOT NULL DEFAULT 0.00, " +
                 "type VARCHAR(20) NOT NULL DEFAULT 'SAVINGS', status VARCHAR(20) DEFAULT 'ACTIVE')");
             
             jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS transactions (" +
-                "id VARCHAR(50) PRIMARY KEY, account_id INTEGER, type VARCHAR(20) NOT NULL, " +
+                "id VARCHAR(50) PRIMARY KEY, account_id INT, type VARCHAR(20) NOT NULL, " +
                 "amount DECIMAL(15,2) NOT NULL, date VARCHAR(10) NOT NULL, time VARCHAR(10) NOT NULL, " +
                 "status VARCHAR(20) DEFAULT 'completed', description TEXT)");
             
-            // Insert default data if not exists
             try {
-                jdbcTemplate.execute("MERGE INTO users (first_name, last_name, email, password, role, account_id) " +
-                    "KEY(email) VALUES ('John', 'Doe', 'john@example.com', 'password123', 'customer', 1)");
+                jdbcTemplate.execute("INSERT INTO users (first_name, last_name, email, password, role, account_id) " +
+                    "SELECT 'John', 'Doe', 'john@example.com', 'password123', 'customer', 1 " +
+                    "WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'john@example.com')");
             } catch (Exception e) {}
             
             try {
-                jdbcTemplate.execute("MERGE INTO accounts (id, name, type, balance, status) " +
-                    "KEY(id) VALUES (1, 'John Doe', 'SAVINGS', 5000.00, 'ACTIVE')");
+                jdbcTemplate.execute("INSERT INTO accounts (id, name, type, balance, status) " +
+                    "SELECT 1, 'John Doe', 'SAVINGS', 5000.00, 'ACTIVE' " +
+                    "WHERE NOT EXISTS (SELECT 1 FROM accounts WHERE id = 1)");
             } catch (Exception e) {}
             
             System.out.println("Database initialized successfully!");

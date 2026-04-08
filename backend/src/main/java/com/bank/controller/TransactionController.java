@@ -3,6 +3,8 @@ package com.bank.controller;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +21,7 @@ import com.bank.service.TransactionService;
 @RequestMapping("/api/transactions")
 public class TransactionController {
 
+    private static final Logger log = LoggerFactory.getLogger(TransactionController.class);
     private final TransactionService transactionService;
 
     public TransactionController(TransactionService transactionService) {
@@ -27,13 +30,20 @@ public class TransactionController {
 
     @GetMapping
     public ResponseEntity<?> listTransactions(@RequestParam(required = false) Integer accountId) {
-        List<Transaction> tx;
-        if (accountId != null) {
-            tx = transactionService.getTransactions(accountId);
-        } else {
-            tx = transactionService.getAllTransactions();
+        try {
+            log.info("Fetching transactions, accountId: {}", accountId);
+            List<Transaction> tx;
+            if (accountId != null) {
+                tx = transactionService.getTransactions(accountId);
+            } else {
+                tx = transactionService.getAllTransactions();
+            }
+            log.info("Found {} transactions", tx.size());
+            return ResponseEntity.ok().body(Map.of("data", tx));
+        } catch (Exception e) {
+            log.error("Error fetching transactions: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
         }
-        return ResponseEntity.ok().body(Map.of("data", tx));
     }
 
     @PostMapping("/deposit")

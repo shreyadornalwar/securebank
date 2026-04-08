@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +26,7 @@ import com.bank.service.EmailService;
 @RequestMapping("/api/accounts")
 public class AccountController {
 
+    private static final Logger log = LoggerFactory.getLogger(AccountController.class);
     private final AccountService accountService;
     private final SseController sseController;
     private final EmailService emailService;
@@ -101,10 +104,13 @@ public class AccountController {
     @GetMapping
     public ResponseEntity<?> getAllAccounts() {
         try {
+            log.info("Fetching all accounts from database");
             List<Account> accounts = accountService.listAccounts();
+            log.info("Found {} accounts", accounts.size());
             List<Map<String, Object>> result = accounts.stream().map(this::toResponse).collect(Collectors.toList());
             return ResponseEntity.ok(result);
         } catch (Exception e) {
+            log.error("Error fetching accounts: {}", e.getMessage(), e);
             return ResponseEntity.internalServerError().body(Map.of("message", e.getMessage()));
         }
     }
