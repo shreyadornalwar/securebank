@@ -4,7 +4,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,21 +25,42 @@ import com.bank.service.EmailService;
 @RequestMapping("/api/email")
 public class EmailController {
 
+    private static final Logger log = LoggerFactory.getLogger(EmailController.class);
+
     private final EmailService emailService;
     private final AccountService accountService;
+    private final JavaMailSender mailSender;
 
-    public EmailController(EmailService emailService, AccountService accountService) {
+    public EmailController(EmailService emailService, AccountService accountService, JavaMailSender mailSender) {
         this.emailService = emailService;
         this.accountService = accountService;
+        this.mailSender = mailSender;
     }
 
     @GetMapping("/test")
     public ResponseEntity<?> testEmail() {
         try {
-            emailService.sendAccountCreatedEmail(999, "Test User", "shreyadornalwar@gmail.com", 1000.0);
-            return ResponseEntity.ok(Map.of("success", true, "message", "Test email triggered"));
+            log.info("=== TEST EMAIL ENDPOINT CALLED ===");
+            log.info("MailSender bean status: {}", mailSender);
+            
+            if (mailSender == null) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "JavaMailSender is NULL! Check Spring Boot mail dependency."));
+            }
+            
+            SimpleMailMessage msg = new SimpleMailMessage();
+            msg.setTo("shreyadornalwar@gmail.com");
+            msg.setFrom("shreyadornalwar@gmail.com");
+            msg.setSubject("TEST EMAIL - SecureBank");
+            msg.setText("This is a test email from SecureBank backend at: " + java.time.LocalDateTime.now());
+            
+            log.info("Attempting to send test email...");
+            mailSender.send(msg);
+            log.info("Test email SENT successfully!");
+            
+            return ResponseEntity.ok(Map.of("success", true, "message", "Test email sent to shreyadornalwar@gmail.com"));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+            log.error("TEST EMAIL FAILED: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Email failed: " + e.getMessage()));
         }
     }
 
