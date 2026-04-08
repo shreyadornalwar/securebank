@@ -154,14 +154,6 @@ public class TransactionService {
         }
     }
 
-    public List<Transaction> getTransactions(int accountId) {
-        return repository.findTransactionsByAccountId(accountId);
-    }
-
-    public List<Transaction> getAllTransactions() {
-        return repository.findAllTransactions();
-    }
-
     /**
      * Generates a transaction report for a specific account.
      * Returns transaction history and a summary with totals.
