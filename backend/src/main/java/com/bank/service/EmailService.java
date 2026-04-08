@@ -55,8 +55,9 @@ public class EmailService {
             message.setTo(email);
             message.setSubject(subject);
             message.setText(body);
-            message.setFrom("noreply@securebank.com");
+            message.setFrom("shreyadornalwar@gmail.com");
 
+            log.info("[EMAIL] Sending email from shreyadornalwar@gmail.com to {}", email);
             mailSender.send(message);
             log.info("[EMAIL] Transaction email SENT to {} for account {} [{}]", email, formattedAccountId, transactionType);
         } catch (Exception e) {
