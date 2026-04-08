@@ -13,3 +13,9 @@ services:
         value: "scxs rbrf hyts"
       - key: PORT
         value: "8080"
+      - key: DATABASE_URL
+        sync: false  # Do not expose in logs
+      - key: SQL_INIT_MODE
+        value: "always"
+      - key: JAVA_OPTS
+        value: "-Xmx512m"

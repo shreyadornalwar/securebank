@@ -20,22 +20,22 @@ public class DatabaseInitializer implements CommandLineRunner {
     public void run(String... args) throws Exception {
         log.info("=== DATABASE INITIALIZER STARTING ===");
         try {
-            // Create users table
+            // Create users table (PostgreSQL compatible)
             jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS users (" +
-                "id INT PRIMARY KEY AUTO_INCREMENT, first_name VARCHAR(100) NOT NULL, last_name VARCHAR(100) NOT NULL, " +
+                "id BIGSERIAL PRIMARY KEY, first_name VARCHAR(100) NOT NULL, last_name VARCHAR(100) NOT NULL, " +
                 "email VARCHAR(255) UNIQUE NOT NULL, password VARCHAR(255) NOT NULL, " +
-                "role VARCHAR(20) NOT NULL DEFAULT 'customer', account_id INT)");
+                "role VARCHAR(20) NOT NULL DEFAULT 'customer', account_id BIGINT)");
             log.info("Users table created");
             
-            // Create accounts table  
+            // Create accounts table (PostgreSQL compatible)
             jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS accounts (" +
-                "id INT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(255) NOT NULL, balance DECIMAL(15,2) NOT NULL DEFAULT 0.00, " +
+                "id BIGSERIAL PRIMARY KEY, name VARCHAR(255) NOT NULL, balance DECIMAL(15,2) NOT NULL DEFAULT 0.00, " +
                 "type VARCHAR(20) NOT NULL DEFAULT 'SAVINGS', status VARCHAR(20) DEFAULT 'ACTIVE')");
             log.info("Accounts table created");
             
-            // Create transactions table
+            // Create transactions table (PostgreSQL compatible)
             jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS transactions (" +
-                "id VARCHAR(50) PRIMARY KEY, account_id INT, type VARCHAR(20) NOT NULL, " +
+                "id VARCHAR(50) PRIMARY KEY, account_id BIGINT, type VARCHAR(20) NOT NULL, " +
                 "amount DECIMAL(15,2) NOT NULL, date VARCHAR(10) NOT NULL, time VARCHAR(10) NOT NULL, " +
                 "status VARCHAR(20) DEFAULT 'completed', description TEXT)");
             log.info("Transactions table created");
