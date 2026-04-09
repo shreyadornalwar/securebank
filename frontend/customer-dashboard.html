@@ -562,9 +562,16 @@
 
         async function loadAccounts() {
             try {
-                const res = await fetchWithTimeout('/api/accounts', {
+                var apiUrl = '/api/accounts';
+                var res = await fetchWithTimeout(apiUrl, {
                     headers: { 'Content-Type': 'application/json' }
                 });
+                if (!res.ok) {
+                    apiUrl = 'http://localhost:8080/api/accounts';
+                    res = await fetchWithTimeout(apiUrl, {
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                }
                 if (res.ok) {
                     const data = await res.json();
                     myAccounts = Array.isArray(data) ? data : [];
@@ -579,9 +586,16 @@
 
         async function loadTransactions() {
             try {
-                const res = await fetchWithTimeout('/api/transactions', {
+                var apiUrl = '/api/transactions';
+                var res = await fetchWithTimeout(apiUrl, {
                     headers: { 'Content-Type': 'application/json' }
                 });
+                if (!res.ok) {
+                    apiUrl = 'http://localhost:8080/api/transactions';
+                    res = await fetchWithTimeout(apiUrl, {
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                }
                 if (res.ok) {
                     const data = await res.json();
                     myTransactions = Array.isArray(data) ? data : (data.data || []);

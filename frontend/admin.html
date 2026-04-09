@@ -655,9 +655,16 @@
 
         async function loadCustomers() {
             try {
-                const response = await fetchWithTimeout('/api/customers', {
+                var apiUrl = '/api/customers';
+                var response = await fetchWithTimeout(apiUrl, {
                     headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
                 });
+                if (!response.ok) {
+                    apiUrl = 'http://localhost:8080/api/customers';
+                    response = await fetchWithTimeout(apiUrl, {
+                        headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
+                    });
+                }
                 if (response.ok) {
                     customers = await response.json();
                     localStorage.setItem('bankCustomers', JSON.stringify(customers));
@@ -669,9 +676,16 @@
 
         async function loadStaff() {
             try {
-                const response = await fetchWithTimeout('/api/staff', {
+                var apiUrl = '/api/staff';
+                var response = await fetchWithTimeout(apiUrl, {
                     headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
                 });
+                if (!response.ok) {
+                    apiUrl = 'http://localhost:8080/api/staff';
+                    response = await fetchWithTimeout(apiUrl, {
+                        headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
+                    });
+                }
                 if (response.ok) {
                     staffMembers = await response.json();
                     localStorage.setItem('bankStaff', JSON.stringify(staffMembers));
@@ -683,9 +697,16 @@
 
         async function loadAccounts() {
             try {
-                const response = await fetchWithTimeout('/api/accounts', {
+                var apiUrl = '/api/accounts';
+                var response = await fetchWithTimeout(apiUrl, {
                     headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
                 });
+                if (!response.ok) {
+                    apiUrl = 'http://localhost:8080/api/accounts';
+                    response = await fetchWithTimeout(apiUrl, {
+                        headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
+                    });
+                }
                 if (response.ok) {
                     accounts = await response.json();
                     localStorage.setItem('bankAccounts', JSON.stringify(accounts));
@@ -697,9 +718,16 @@
 
         async function loadTransactions() {
             try {
-                const response = await fetchWithTimeout('/api/transactions', {
+                var apiUrl = '/api/transactions';
+                var response = await fetchWithTimeout(apiUrl, {
                     headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
                 });
+                if (!response.ok) {
+                    apiUrl = 'http://localhost:8080/api/transactions';
+                    response = await fetchWithTimeout(apiUrl, {
+                        headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
+                    });
+                }
                 if (response.ok) {
                     const data = await response.json();
                     transactions = Array.isArray(data) ? data : (data.data || []);
