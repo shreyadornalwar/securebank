@@ -1,7 +1,7 @@
 (function (window) {
   // ==================== CONFIGURATION ====================
-  const BASE_URL = "https://securebank-backend-rc4i.onrender.com";
-  const API_BASE_URL = BASE_URL + "/api";
+const BASE_URL = "";
+const API_BASE_URL = "/api";
   // =====================================================
 
   function timedFetch(url, options, timeout) {
@@ -33,7 +33,11 @@
         }
         return this.isBackendAvailable;
       } catch (error) {
-        console.warn('Backend check failed:', error.message);
+        if (error.name === 'AbortError' || error.message.includes('aborted')) {
+          console.warn('Backend check timed out - server not responding');
+        } else {
+          console.warn('Backend check failed:', error.message);
+        }
         this.isBackendAvailable = false;
         return false;
       }

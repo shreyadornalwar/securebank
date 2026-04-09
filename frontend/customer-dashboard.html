@@ -562,7 +562,7 @@
 
         async function loadAccounts() {
             try {
-                const res = await fetchWithTimeout('https://securebank-backend-rc4i.onrender.com/api/accounts', {
+                const res = await fetchWithTimeout('/api/accounts', {
                     headers: { 'Content-Type': 'application/json' }
                 });
                 if (res.ok) {
@@ -579,7 +579,7 @@
 
         async function loadTransactions() {
             try {
-                const res = await fetchWithTimeout('https://securebank-backend-rc4i.onrender.com/api/transactions', {
+                const res = await fetchWithTimeout('/api/transactions', {
                     headers: { 'Content-Type': 'application/json' }
                 });
                 if (res.ok) {
