@@ -2,6 +2,7 @@ package com.bank;
 
 import java.util.concurrent.Executor;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +16,9 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 public class Main {
 
     public static void main(String[] args) {
+        Dotenv dotenv = Dotenv.configure().load();
+        System.setProperty("MAIL_USERNAME", dotenv.get("MAIL_USERNAME", "shreyadornalwar@gmail.com"));
+        System.setProperty("MAIL_PASSWORD", dotenv.get("MAIL_PASSWORD", ""));
         SpringApplication.run(Main.class, args);
     }
 

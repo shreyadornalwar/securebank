@@ -54,6 +54,13 @@
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
 
+        <!-- Environment Variables from .env file -->
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>dotenv-java</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+
         <!-- WebSocket -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
